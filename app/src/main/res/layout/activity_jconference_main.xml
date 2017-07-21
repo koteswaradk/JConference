@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.juniper.jconference.JConferenceMainActivity">
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/title_layout"
+        android:gravity="center"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <TextView
+            android:id="@+id/title"
+            android:layout_gravity="center"
+            android:textSize="30dp"
+            android:textColor="@color/cardview_light_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <ListView
+
+        android:id="@+id/edisplay_list"
+        android:text="Event"
+        android:divider="@null"
+        android:layout_below="@+id/title_layout"
+        android:dividerHeight="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/t_no_data"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="No Meetings Listed Today"
+        android:layout_height="wrap_content" />
+
+
+</RelativeLayout>

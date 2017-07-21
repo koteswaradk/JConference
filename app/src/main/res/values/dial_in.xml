@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="dial_in_array">
+        <item>Australia, Sydney:+61289139885</item>
+        <item>Belgium, Brussels:‪+3224033300‬</item>
+        <item>Canada, Kanata:‪+16135912790‬</item>
+        <item>China, Beijing:+861058126200</item>
+        <item>China, Guangzhou:‪+862085115999‬</item>
+        <item>China, Hong Kong:‪+85231022166</item>
+        <item>China, Shanghai:‪+862161415199</item>
+        <item>France, Paris	:+33147756336</item>
+        <item>Germany, Munich:‪+4989203012111</item>
+        <item>India, Bangalore:18002660610</item>
+        <item>Ireland, Dublin:+35318903656</item>
+        <item>Italy, Milan:‪+390236014377</item>
+        <item>Japan, Tokyo:‪+81353330594</item>
+        <item>Korea, Seoul:‪+82234833444</item>
+        <item>Malaysia, Kuala Lumpur:‪+60320790002</item>
+        <item>Netherlands, Amsterdam:+31207125790‬‬</item>
+        <item>Saudi Arabia, Riyadh:+966112804200</item>
+        <item>Singapore, Singapore:+6565113580</item>
+        <item>Spain, Madrid:+34914143451</item>
+        <item>Sweeden, Stockholm:‪+46850644666</item>
+        <item>Taiwan, Taipei:‪+886221756353</item>
+        <item>UAE, Dubai:‪+97143611505</item>
+        <item>UK, Addlestone:+441372389100</item>
+        <item>USA, East Coast:+19785898300</item>
+        <item>USA, East Coast:+14089369000</item>
+        <item>USA, East Coast:+18446454399</item>
+        <item>USA, West Coast:‪+14089369000‬</item>
+        <item>USA, West Coast:+19785898300</item>
+        <item>USA, West Coast:+18446454398</item>
+    </string-array>
+</resources>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">JDialer</string>
+    <string name="custom_notification">Conference CAll</string>
+    <string name="no_today_meeting">Today No Meeting Scheduled</string>
+    <string name="meeting_text">Meeting: </string>
+    <string name="phone_number">Num:</string>
+    <string name="confid">Conference ID:</string>
+</resources>
