@@ -16,6 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.juniper.jconference.R;
 import com.juniper.jconference.model.CallModel;
@@ -70,14 +71,6 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             viewHolder.time_zone_display=(TextView)convertView.findViewById(R.id.time_zone_display);
             viewHolder.title_display=(TextView)convertView.findViewById(R.id.title_display);
             viewHolder.liner_layout=(LinearLayout) convertView.findViewById(R.id.add_list_layout);
-           /* viewHolder.dialnumber_display=(TextView)convertView.findViewById(R.id.dialnumber_display);
-            viewHolder.conferenceid_display=(TextView)convertView.findViewById(R.id.conferenceid_display);*/
-
-           /* viewHolder.conferenceid=(TextView)convertView.findViewById(R.id.conferenceid);
-            viewHolder.dialnumber=(TextView)convertView.findViewById(R.id.dialnumber);
-
-            viewHolder.ib_call=(ImageButton)convertView.findViewById(R.id.ib_call);*/
-
 
             convertView.setTag(viewHolder);
         }else {
@@ -92,42 +85,16 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         viewHolder.title_display.setText(conferencecallmodel.getTitle());
         setItems(conferencecallmodel,position,viewHolder);
         for (int i = 0; i < conferencecallmodel.getNumberList().size(); i++) {
-           Log.d(TAG+"list",conferencecallmodel.getNumberList().get(i));
-        }
-       /* viewHolder.dialnumber_display.setText(conferencecallmodel.getPhNumber());
-        viewHolder.conferenceid_display.setText(conferencecallmodel.getConference());*/
-
-
-       /* if (conferencecallmodel.getConference().isEmpty()){
-            viewHolder.ib_call.setVisibility(View.GONE);
-            viewHolder.dialnumber.setVisibility(View.GONE);
-            viewHolder.conferenceid.setVisibility(View.GONE);
-            viewHolder.conferenceid_display.setText("No Conference Call Available");
-        }
-        if (!conferencecallmodel.getConference().isEmpty()){
-            viewHolder.ib_call.setVisibility(View.VISIBLE);
-            viewHolder.dialnumber.setVisibility(View.VISIBLE);
-            viewHolder.conferenceid.setVisibility(View.VISIBLE);
-
+          // Log.d(TAG+"list",conferencecallmodel.getNumberList().get(i));
         }
 
-*/
-       /* viewHolder.ib_call.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                callPhoneNumber= conferencecallmodel.getPhNumber();
-                callConferenceId= conferencecallmodel.getConference();
-                dialNumberWithPermision(callPhoneNumber,callConferenceId);
-            }
-        });*/
         notifyDataSetChanged();
 
         return convertView;
     }
     private void setItems(CallModel eventlist, int position, ViewHolder holder) {
         holder.liner_layout.removeAllViews();
-        System.out.println("===============================");
+      //  System.out.println("===============================");
 
         LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for (int i = 0; i < eventlist.getNumberList().size(); i++) {
@@ -153,8 +120,10 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
         }
 
-        System.out.println("===============================");
+      //  System.out.println("===============================");
     }
+
+
     public void dialNumberWithPermision(String pnmu, String conf){
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
@@ -184,7 +153,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         if(pnmu.substring(0,2).equalsIgnoreCase("18")){
             Intent callIntent = new Intent(Intent.ACTION_CALL);
             // callIntent.setData(Uri.parse("tel:"+pnmu+";"+conf+"#"));
-            callIntent.setData(Uri.parse("tel:"+pnmu+",,,,"+conf+"#"));
+            callIntent.setData(Uri.parse("tel:"+pnmu+",,,,,"+conf+"#"));
             context.startActivity(callIntent);
         }else{
             Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -203,8 +172,6 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         TextView title_display;
         TextView dialnumber_display;
         TextView conferenceid_display;
-        TextView conferenceid;
-        TextView dialnumber;
         ImageButton ib_call;
 
 

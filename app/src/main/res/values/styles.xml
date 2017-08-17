@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:titleTextStyle">@style/NoTitleText</item>
         <item name="android:subtitleTextStyle">@style/NoTitleText</item>
+
     </style>
     <style name="NoTitleText">
         <item name="android:textSize">0sp</item>

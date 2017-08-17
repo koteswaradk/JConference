@@ -24,15 +24,19 @@ import java.util.HashMap;
 
 public class Provider extends ContentProvider{
     //AUTHORITY
-    public static final String CONTENT_AUTHORITY = "com.juniper.jconference.gpsmonitor";
+    public static final String CONTENT_AUTHORITY = "com.juniper.jconference.provider";
     //URL
     public static final String EVENTS_URL = "content://"+ CONTENT_AUTHORITY +"/"+ EventsDBHelper.EVENTS_TABLE;
+    public static final String CURRENT_EVENTS_URL = "content://"+ CONTENT_AUTHORITY +"/"+ EventsDBHelper.CURRENT_EVENTS_TABLE;
 
     public static final Uri CONTENT_EVENTS_URI = Uri.parse(EVENTS_URL);
+    public static final Uri CONTENT_CURRENT_EVENTS_URI = Uri.parse(CURRENT_EVENTS_URL);
 
     //URI MATCHER ID FOR DATA RETRIVE
     static final int EVENTS = 1;
     static final int EVENTS_ID = 2;
+    static final int CURRENT_EVENTS = 3;
+    static final int CURRENT_EVENTS_ID = 4;
 
     /**
      * Database specific constant declarations
@@ -52,7 +56,25 @@ public class Provider extends ContentProvider{
 
         uriMatcher.addURI(CONTENT_AUTHORITY, EventsDBHelper.EVENTS_TABLE, EVENTS);
         uriMatcher.addURI(CONTENT_AUTHORITY, EventsDBHelper.EVENTS_TABLE+"/#", EVENTS_ID);
+        uriMatcher.addURI(CONTENT_AUTHORITY, EventsDBHelper.CURRENT_EVENTS_TABLE, CURRENT_EVENTS);
+        uriMatcher.addURI(CONTENT_AUTHORITY, EventsDBHelper.CURRENT_EVENTS_TABLE+"/#", CURRENT_EVENTS_ID);
 
+    }
+    @Nullable
+    @Override
+    public String getType(@NonNull Uri uri) {
+        switch (uriMatcher.match(uri)) {
+            case EVENTS:
+                return "vnd.android.cursor.dir/vnd.com.juniper.jconference."+ EventsDBHelper.EVENTS_TABLE;
+            case EVENTS_ID:
+                return "vnd.android.cursor.dir/vnd.com.juniper.jconference."+ EventsDBHelper.EVENTS_TABLE;
+            case CURRENT_EVENTS:
+                return "vnd.android.cursor.dir/vnd.com.juniper.jconference."+ EventsDBHelper.CURRENT_EVENTS_TABLE;
+            case CURRENT_EVENTS_ID:
+                return "vnd.android.cursor.dir/vnd.com.juniper.jconference."+ EventsDBHelper.CURRENT_EVENTS_TABLE;
+            default:
+                throw new IllegalArgumentException("Invalid URI: "+uri);
+        }
     }
     @Override
     public boolean onCreate() {
@@ -74,6 +96,14 @@ public class Provider extends ContentProvider{
                 qb.setTables(EventsDBHelper.EVENTS_TABLE);
                 qb.appendWhere(EventsDBHelper.KEY_EVENT + "=?" + uri.getPathSegments().get(1));
                 break;
+            case CURRENT_EVENTS:
+                qb.setTables(EventsDBHelper.CURRENT_EVENTS_TABLE);
+                qb.setProjectionMap(values);
+                break;
+            case CURRENT_EVENTS_ID:
+                qb.setTables(EventsDBHelper.CURRENT_EVENTS_TABLE);
+                qb.appendWhere(EventsDBHelper.KEY_CURRE_EVENT + "=?" + uri.getPathSegments().get(1));
+                break;
             default:
                 throw new IllegalArgumentException( "illegal uri: " + uri);
 
@@ -89,18 +119,7 @@ public class Provider extends ContentProvider{
         return c;
     }
 
-    @Nullable
-    @Override
-    public String getType(@NonNull Uri uri) {
-        switch (uriMatcher.match(uri)) {
-            case EVENTS:
-                return "vnd.android.cursor.dir/vnd.com.juniper.jconference."+ EventsDBHelper.EVENTS_TABLE;
-            case EVENTS_ID:
-                return "vnd.android.cursor.dir/vnd.com.juniper.jconference."+ EventsDBHelper.EVENTS_TABLE;
-            default:
-                throw new IllegalArgumentException("Invalid URI: "+uri);
-        }
-    }
+
 
     @Nullable
     @Override
@@ -113,6 +132,10 @@ public class Provider extends ContentProvider{
         switch (uriMatcher.match(uri)){
             case EVENTS:
                 rowID = db.insert(EventsDBHelper.EVENTS_TABLE, null, contentValues);
+                getContext().getContentResolver().notifyChange(uri, null);
+                break;
+            case CURRENT_EVENTS:
+                rowID = db.insert(EventsDBHelper.CURRENT_EVENTS_TABLE, null, contentValues);
                 getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
@@ -145,6 +168,17 @@ public class Provider extends ContentProvider{
                     where1 += " AND " + selection;
                 }
                 count = db.delete(EventsDBHelper.EVENTS_TABLE, where1, selectionArgs);
+                break;
+            case CURRENT_EVENTS:
+                count = db.delete(EventsDBHelper.CURRENT_EVENTS_TABLE, null, null);
+                break;
+            case CURRENT_EVENTS_ID:
+                String idStr2 = uri.getLastPathSegment();
+                String where2 = CURRENT_EVENTS_ID + " = " + idStr2;
+                if (!TextUtils.isEmpty(selection)) {
+                    where2 += " AND " + selection;
+                }
+                count = db.delete(EventsDBHelper.CURRENT_EVENTS_TABLE, where2, selectionArgs);
 
                 break;
 
@@ -175,7 +209,18 @@ public class Provider extends ContentProvider{
                 }
                 count = db.update(EventsDBHelper.EVENTS_TABLE, contentValues, where, whereArgs);
                 break;
+            case CURRENT_EVENTS:
+                count = db.update(EventsDBHelper.CURRENT_EVENTS_TABLE, contentValues, wheree, whereArgs);
 
+                break;
+            case CURRENT_EVENTS_ID:
+                String idStr1 = uri.getLastPathSegment();
+                String where1 = CURRENT_EVENTS_ID + " = " + idStr1;
+                if (!TextUtils.isEmpty(wheree)) {
+                    where1 += " AND " + wheree;
+                }
+                count = db.update(EventsDBHelper.CURRENT_EVENTS_TABLE, contentValues, where1, whereArgs);
+                break;
 
             default:
                 throw new IllegalArgumentException( "illegal uri: " + uri);

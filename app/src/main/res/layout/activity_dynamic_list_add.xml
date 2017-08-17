@@ -76,6 +76,7 @@
 
         </LinearLayout>
 
+
         <LinearLayout
             android:layout_width="35dp"
             android:layout_alignParentRight="true"
@@ -89,12 +90,21 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </RelativeLayout>
+    <devs.mulham.horizontalcalendar.HorizontalCalendarView
+        android:id="@+id/calendarView"
+        android:layout_below="@+id/title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:textColorSelected="#FFFF"
+
+
+        />
     <ListView
 
         android:id="@+id/list"
-
         android:divider="@null"
-        android:layout_below="@+id/title_layout"
+        android:layout_below="@+id/calendarView"
         android:dividerHeight="0dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

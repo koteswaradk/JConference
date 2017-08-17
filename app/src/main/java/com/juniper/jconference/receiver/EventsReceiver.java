@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.widget.RemoteViews;
 
 import com.juniper.jconference.DynamicListAddActivity;
+import com.juniper.jconference.JDialerMainActivity;
 import com.juniper.jconference.R;
 import com.juniper.jconference.model.CallModel;
 import com.juniper.jconference.service.EventsService;
@@ -142,7 +143,7 @@ public class EventsReceiver extends BroadcastReceiver {
 
         // BEGIN_INCLUDE(intent)
         //Create Intent to launch this Activity again if the notification is clicked.
-        Intent i = new Intent(context, DynamicListAddActivity.class);
+        Intent i = new Intent(context, JDialerMainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent intent = PendingIntent.getActivity(context, 123, i, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(intent);
@@ -238,7 +239,7 @@ public class EventsReceiver extends BroadcastReceiver {
     }
     private void notificationCustom(Context context,String event,String time,String date,String year,String month){
 
-        Intent intent = new Intent(context, DynamicListAddActivity.class);
+        Intent intent = new Intent(context, JDialerMainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);

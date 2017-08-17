@@ -2,7 +2,13 @@
     <string name="app_name">JDialer</string>
     <string name="custom_notification">Conference CAll</string>
     <string name="no_today_meeting">Today No Meeting Scheduled</string>
+    <string name="re_no_today_meeting">Today No Meeting Scheduled/May Completed Already</string>
+    <string name="recursive_meting_title">Recurrence Meetings</string>
     <string name="meeting_text">Meeting: </string>
     <string name="phone_number">Num:</string>
     <string name="confid">Conference ID:</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">fragment AllDays</string>
+    <string name="hello_blank_fragment1">fragment current</string>
 </resources>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/levele2"
+            android:layout_width="match_parent"
+            android:background="@color/colorPrimaryDark"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical"
+                android:padding="05dp"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:orientation="horizontal"
+
+
+                    android:padding="05dp"
+                    android:layout_weight="1"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tool_date_display"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text=""
+                        android:textColor="@color/cardview_light_background"
+
+                        android:textSize="30sp" />
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView2" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="right"
+                android:padding="05dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/myswitch"
+                    android:background="@drawable/switch_selector"
+                    android:thumb="@android:color/transparent"
+                    android:track="@android:color/transparent"
+                    android:layout_marginRight="10dp"
+                    android:layout_height="30dp"
+                    android:layout_width="30dp" />
+               <!-- <ImageButton
+                    android:id="@+id/b_switch"
+                    android:background="@drawable/call_selector"
+                    android:layout_width="30dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_height="30dp" />-->
+                <ImageButton
+                    android:id="@+id/b_synch"
+                    android:background="@drawable/refresh_selector"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+</LinearLayout>
+</LinearLayout>
