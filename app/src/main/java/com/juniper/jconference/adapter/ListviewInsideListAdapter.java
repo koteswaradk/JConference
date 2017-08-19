@@ -3,16 +3,20 @@ package com.juniper.jconference.adapter;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -70,6 +74,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             viewHolder.date_display=(TextView)convertView.findViewById(R.id.date_display);
             viewHolder.time_zone_display=(TextView)convertView.findViewById(R.id.time_zone_display);
             viewHolder.title_display=(TextView)convertView.findViewById(R.id.title_display);
+            viewHolder.mainlayout=(LinearLayout)convertView.findViewById(R.id.main_layout);
             viewHolder.liner_layout=(LinearLayout) convertView.findViewById(R.id.add_list_layout);
 
             convertView.setTag(viewHolder);
@@ -87,10 +92,48 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         for (int i = 0; i < conferencecallmodel.getNumberList().size(); i++) {
           // Log.d(TAG+"list",conferencecallmodel.getNumberList().get(i));
         }
-
+        viewHolder.mainlayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               Log.d(TAG+"uuuuuuu",conferencecallmodel.getDetails());
+                showInfoDialog(conferencecallmodel.getDetails());
+            }
+        });
         notifyDataSetChanged();
 
         return convertView;
+    }
+    private void showInfoDialog(String reason) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+        LayoutInflater inflater= LayoutInflater.from(context);
+        View view=inflater.inflate(R.layout.dialog_alert_scrollable, null);
+
+        TextView textview=(TextView)view.findViewById(R.id.textmsg);
+        textview.setText(reason);
+
+
+        // set dialog message
+        alertDialogBuilder
+                .setTitle("Meeting Details:")
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+
+       // positive.setBackgroundColor());
+        // show it
+        alertDialog.show();
     }
     private void setItems(CallModel eventlist, int position, ViewHolder holder) {
         holder.liner_layout.removeAllViews();
@@ -157,7 +200,8 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             context.startActivity(callIntent);
         }else{
             Intent callIntent = new Intent(Intent.ACTION_CALL);
-            callIntent.setData(Uri.parse("tel:"+pnmu+";"+conf+"#"));
+            callIntent.setData(Uri.parse("tel:"+pnmu+",,,,"+conf+"#"));
+           // callIntent.setData(Uri.parse("tel:"+pnmu+";"+conf+"#"));
             context.startActivity(callIntent);
         }
 
@@ -173,6 +217,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         TextView dialnumber_display;
         TextView conferenceid_display;
         ImageButton ib_call;
+        LinearLayout mainlayout;
 
 
 

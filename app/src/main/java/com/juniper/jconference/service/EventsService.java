@@ -63,7 +63,7 @@ public class EventsService extends Service {
     String device_date_month_year_time;
     ArrayList<String>phonenumberList;
     String mydate,devicedate;
-
+    ArrayList<String>callist;
     public EventsService() {
     }
     @Override
@@ -72,9 +72,137 @@ public class EventsService extends Service {
 
         super.onStartCommand(intent, flags, startId);
         Log.i(TAG,"onStartCommand");
-       // readCurrentEventsFromCallender();
+
         updateDBFromServer();
         return START_STICKY;
+    }
+
+    private void dbCheck() {
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+        String devicedate = formatter.format(today).replace("/", " ");
+
+        //ArrayList<String> calendarlist=readCalendarList(devicedate);
+        //readDBList(calendarlist);
+
+
+
+    }
+
+    private ArrayList<String> readCalendarList(String device_date) {
+
+
+        String[] projection = new String[]{CalendarContract.Events.CALENDAR_ID, CalendarContract.Events.TITLE, CalendarContract.Events.DESCRIPTION, CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND, CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_LOCATION};
+        Cursor cursor = null;
+        // 0 = January, 1 = February, ...
+        // Log.i(TAG, "readEventsFromCallender");
+        Calendar startTime = Calendar.getInstance();
+        startTime.set(Calendar.HOUR_OF_DAY, 0);
+        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.SECOND, 0);
+        Calendar endTime = Calendar.getInstance();
+        endTime.add(Calendar.DATE, 1);
+
+        String selection = "(( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " ) AND ( " + CalendarContract.Events.DTSTART + " <= " + endTime.getTimeInMillis() + " ))";
+
+        // Log.i(TAG, "selection");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions((Activity)context, new String[]{Manifest.permission.READ_CALENDAR},
+                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            //return ;
+        }
+        try {
+
+            cursor = getContentResolver().query(CalendarContract.Events.CONTENT_URI, projection, selection, null, null);
+            // Log.i(TAG, cursor + "iiiiii");
+            if (cursor != null) {
+                callist=new ArrayList<>();
+                if (cursor.moveToFirst()) {
+
+                    do {
+
+                        String date_from_evet =new Date(cursor.getLong(3)).toString().substring(8,10)+" "+new Date(cursor.getLong(3)).toString().substring(4,7)+" "+new Date(cursor.getLong(3)).toString().substring(30,34);
+
+                        if (date_from_evet.equalsIgnoreCase(device_date.replace("-"," "))){
+                              //  Log.d(TAG,"inside if");
+                            //calTitle = cursor.getString(1);
+                            callist.add(cursor.getString(1));
+                           // Log.d(TAG,cursor.getString(1));
+
+                        }
+
+                    } while (cursor.moveToNext());
+
+                }
+
+
+            }
+        } catch (Exception ex) {
+
+        } finally {
+            try {
+                if (cursor != null && !cursor.isClosed())
+                    cursor.close();
+
+            } catch (Exception ex) {
+            }
+
+
+        }
+        return callist;
+    }
+
+    private void readDBList(ArrayList<String>callist) {
+       // ArrayList<String> al=new ArrayList<>();
+        Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
+        try {
+            if (cursor!=null) {
+
+                if (cursor.moveToFirst()) {
+
+                    do {
+
+                       // al.add(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT)));
+
+                        for (int i=0;i<callist.size();i++){
+                            if (callist.get(i).contentEquals(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT))))
+                            {
+                               // Log.i("callist",callist.get(i));
+                              //  Log.i("dblist",cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT)));
+                            }else
+                               // (!callist.get(i).contentEquals(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT))))
+                            {
+
+                                if (callist.get(i).contentEquals(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT)))){
+                                    Log.i("else callist",callist.get(i));
+                                }
+                               // Log.i("else dblist",cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT)));
+                            }
+                        }
+
+
+                    } while (cursor.moveToNext());
+
+                }
+            }if (cursor==null){
+
+
+            }
+        }catch (IndexOutOfBoundsException e){
+
+        }
+
+      //  return al;
     }
 
     @Override
@@ -114,43 +242,40 @@ public class EventsService extends Service {
         Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
         if (cursor!=null) {
             if (cursor.moveToFirst()) {
-                String date_from_evet =cursor.getString(
-                        cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+
-                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4,7)+" "+
-                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);
-                //   Log.d("service ","date_from_evet: "+date_from_evet);
-                if (devicedate.equalsIgnoreCase(date_from_evet))
-                {
-                   // insertDataToDb(devicedate);
-                    //updateCurrentEventsFromCalendar(devicedate);
+                do {
+                    String date_from_evet =cursor.getString(
+                            cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+
+                            cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4,7)+" "+
+                            cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);
+                    //   Log.d("service ","date_from_evet: "+date_from_evet);
+                    if (devicedate.equalsIgnoreCase(date_from_evet))
+                    {
 
-                   if (!geTitleFromDB(devicedate).equalsIgnoreCase(geTitleFromCallender(devicedate))){
-                     /*  Log.d("service ","not equal---");
-                       Log.i("from db",geTitleFromDB(devicedate));
-                       Log.i("from callander",geTitleFromCallender(devicedate));*/
-                      // insertTitleToDB(geTitleFromCallender(devicedate,));
-                       insertDataToDb(devicedate,geTitleFromCallender(devicedate));
-                   }else{
-                      // Log.i("out side",geTitleFromCallender(devicedate));
-                   }
+                        if (!geTitleFromDB().contains(geTitleFromCallender(devicedate))){
+
+                            insertDataToDb(devicedate,geTitleFromCallender(devicedate));
+                           // readCurrentEventsFromCallender(devicedate);
+
+                        }else{
+                            // Log.i("out side",geTitleFromCallender(devicedate));
+                        }
 
 
 
-                }
+                    }
+                }while (cursor.moveToNext());
+
             }
         }
 
     }
 
 
-    public void updateCurrentEventsFromCalendar(String _devicedate) {
-
-       /* Date today = Calendar.getInstance().getTime();
-
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
-        devicedate = formatter.format(today).replace("/"," ");
+    public void readCurrentEventsFromCallender(String _date) {
         String[] projection = new String[]{CalendarContract.Events.CALENDAR_ID, CalendarContract.Events.TITLE, CalendarContract.Events.DESCRIPTION, CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND, CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_LOCATION};
         Cursor cursor = null;
+        // 0 = January, 1 = February, ...
+        // Log.i(TAG, "readEventsFromCallender");
         Calendar startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 0);
         startTime.set(Calendar.MINUTE, 0);
@@ -159,7 +284,7 @@ public class EventsService extends Service {
         endTime.add(Calendar.DATE, 1);
 
         String selection = "(( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " ) AND ( " + CalendarContract.Events.DTSTART + " <= " + endTime.getTimeInMillis() + " ))";
-*/
+
         // Log.i(TAG, "selection");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
 
@@ -176,99 +301,48 @@ public class EventsService extends Service {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-
-        long now = System.currentTimeMillis();
-        Uri.Builder eventsUriBuilder = CalendarContract.Instances.CONTENT_URI.buildUpon();
-        ContentUris.appendId(eventsUriBuilder, Long.MIN_VALUE);
-        ContentUris.appendId(eventsUriBuilder, Long.MAX_VALUE);
-        String[] projection = new String[]{CalendarContract.Instances.CALENDAR_ID, CalendarContract.Instances.TITLE,
-                CalendarContract.Instances.DESCRIPTION, CalendarContract.Instances.BEGIN,
-                CalendarContract.Instances.END, CalendarContract.Instances.EVENT_LOCATION,
-                CalendarContract.Instances.EVENT_ID};
-
-        Uri eventsUri = eventsUriBuilder.build();
-        Cursor cursor = getContentResolver().query(
-                eventsUri, projection, CalendarContract.Instances.BEGIN + " >= " + now + " and " + CalendarContract.Instances.BEGIN
-                        + " <= " + (now + 2592000000L) + " and " + CalendarContract.Instances.VISIBLE + " = 1",
-                null, CalendarContract.Instances.DTSTART + " ASC");
-        Cursor dbcursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
         try {
-            Log.i(TAG, cursor + "iiiiii");
-            if ((cursor != null)) {
 
-                Log.i(TAG, cursor.moveToFirst() + "kkkk");
+            cursor = getContentResolver().query(CalendarContract.Events.CONTENT_URI, projection, selection, null, null);
+            // Log.i(TAG, cursor + "iiiiii");
+            if (cursor != null) {
 
 
-                if (cursor.moveToFirst()&&(dbcursor.moveToFirst())) {
-
+                if (cursor.moveToFirst()) {
 
                     do {
+                        String date_from_evet =new Date(cursor.getLong(3)).toString().substring(8,10)+" "+new Date(cursor.getLong(3)).toString().substring(4,7)+" "+new Date(cursor.getLong(3)).toString().substring(30,34);
+                        //  Log.d(TAG,"event date"+date_from_evet);
+                        //  Log.d(TAG," date of current"+devicedate);
+                        if (date_from_evet.equalsIgnoreCase(_date.replace("-"," "))){
+                            String titles = cursor.getString(1);
+                            String details =cursor.getString(2);
+                            String date_and_time_full= new Date((cursor.getLong(3))).toString();
+                            //  Log.i(TAG,"insert date and time "+date_and_time_full);
+                             Log.d(TAG,"insert titles"+titles);
+                            //  Log.d(TAG,"insert details"+details);
+                            // Log.d(TAG, "-------------------------------------");
+                            ContentValues selectedValues = new ContentValues();
+                            selectedValues.put(EventsDBHelper.KEY_CURRE_DATE_TIME, date_and_time_full);
+                            selectedValues.put(EventsDBHelper.KEY_CURRE_EVENT, titles);
+                            selectedValues.put(EventsDBHelper.KEY_CURRE_DETAILS,details);
 
-                        String date_from_evet = new Date(cursor.getLong(3)).toString().substring(8, 10) + " " + new Date(cursor.getLong(3)).toString().substring(4, 7) + " " + new Date(cursor.getLong(3)).toString().substring(30, 34);
-                       /* Log.d(TAG, "event date" + date_from_evet);
-                        Log.d(TAG, " date of current" + _devicedate);*/
-                        if (date_from_evet.equalsIgnoreCase(_devicedate.replace("-", " "))) {
+                            Uri selectedUri = context.getContentResolver().insert(Provider.CONTENT_CURRENT_EVENTS_URI, selectedValues);
+                            if (selectedUri!=null){
+                                if (ContentUris.parseId(selectedUri)>0);
 
-                            Log.d(TAG, "1");
+                            }else{
 
-                            Log.d(TAG, "2");
-                            if (dbcursor != null) {
-                                Log.d(TAG, "3");
-                                if (dbcursor.moveToFirst()) {
-                                    Log.d(TAG, "4");
-                                    String title = dbcursor.getString(dbcursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT));
-                                    Log.d("service ", "title: " + title);
-
-                                    String titlecaleneder = cursor.getString(1);
-                                    Log.d("service ", "calendar title: " + titlecaleneder);
-                                    if (title.equalsIgnoreCase(titlecaleneder)) {
-                                        Log.d("service ", " equal");
-                                        String titles = cursor.getString(1);
-                                        String details = cursor.getString(2);
-                                        String date_and_time_full = new Date((cursor.getLong(3))).toString();
-                                          Log.i(TAG,"insert date and time "+date_and_time_full);
-                                          Log.d(TAG,"insert titles"+titles);
-                                          Log.d(TAG,"insert details"+details);
-                                          Log.d(TAG, "-------------------------------------");
-                                        ContentValues selectedValues = new ContentValues();
-                                        selectedValues.put(EventsDBHelper.KEY_CURRE_DATE_TIME, date_and_time_full);
-                                        selectedValues.put(EventsDBHelper.KEY_CURRE_EVENT, titles);
-                                        selectedValues.put(EventsDBHelper.KEY_CURRE_DETAILS,details);
-
-                                        Uri selectedUri = getContentResolver().insert(Provider.CONTENT_CURRENT_EVENTS_URI, selectedValues);
-                                        if (selectedUri!=null){
-                                            if (ContentUris.parseId(selectedUri)>0);
-
-                                        }else{
-
-                                        }
-
-
-                                    }
-                                    if (!title.equalsIgnoreCase(titlecaleneder)) {
-                                        Log.d("service", "not equal");
-                                        String titles = cursor.getString(1);
-                                        String details =cursor.getString(2);
-                                        String date_and_time_full= new Date((cursor.getLong(3))).toString();
-                                        Log.i(TAG,"insert date and time "+date_and_time_full);
-                                        Log.d(TAG,"insert titles"+titles);
-                                        Log.d(TAG,"insert details"+details);
-
-                                    }
-                                }
                             }
-
-
                         }
 
 
-                    } while (cursor.moveToNext()&&(dbcursor.moveToNext()));
-
+                    } while (cursor.moveToNext());
 
                 }
+
+
             }
-
-
         } catch (Exception ex) {
 
         } finally {
@@ -278,10 +352,12 @@ public class EventsService extends Service {
 
             } catch (Exception ex) {
             }
+
+
         }
     }
 
-    public String geTitleFromDB(String devicedate){
+    public String geTitleFromDB(){
         String dbTitle=null;
 
         Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
@@ -354,6 +430,7 @@ public class EventsService extends Service {
                         if (date_from_evet.equalsIgnoreCase(devicedate.replace("-"," "))){
                             //    Log.d(TAG,"inside if");
                             calTitle = cursor.getString(1);
+                          //  Log.d(TAG,cursor.getString(1));
 
                         }
 
@@ -431,7 +508,7 @@ public class EventsService extends Service {
                             String details = cursor.getString(2);
                             String date_and_time_full = new Date((cursor.getLong(3))).toString();
                             /*  Log.i(TAG,"insert date and time "+date_and_time_full);
-                              Log.d(TAG,"insert titles"+titles);
+
                               Log.d(TAG,"insert details"+details);
                              Log.d(TAG, "-------------------------------------");*/
                             ContentValues selectedValues = new ContentValues();

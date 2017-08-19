@@ -2,6 +2,8 @@ package com.juniper.jconference.receiver;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -18,6 +20,7 @@ import android.util.Log;
 
 import com.juniper.jconference.db.EventsDBHelper;
 import com.juniper.jconference.provider.Provider;
+import com.juniper.jconference.service.EventsService;
 import com.juniper.jconference.util.ConnectionDetector;
 
 import java.text.SimpleDateFormat;
@@ -39,6 +42,20 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
             // DO WHATEVER YOU NEED TO DO HERE
             System.out.println("SCREEN TURNED OFF");
             wasScreenOn = false;
+            PendingIntent service = null;
+            Intent intentForService = new Intent(context.getApplicationContext(), EventsService.class);
+            final AlarmManager alarmManager = (AlarmManager)
+            context.getSystemService(Context.ALARM_SERVICE);
+            final Calendar time = Calendar.getInstance();
+            time.set(Calendar.MINUTE, 0);
+            time.set(Calendar.SECOND, 0);
+            time.set(Calendar.MILLISECOND, 0);
+            if (service == null) {
+                service = PendingIntent.getService(context, 0,
+                        intentForService, PendingIntent.FLAG_CANCEL_CURRENT);
+            }
+
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime().getTime(), 60, service);
         } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
             // AND DO WHATEVER YOU NEED TO DO HERE
             System.out.println("SCREEN TURNED ON");
@@ -77,6 +94,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
                 if (devicedate.equalsIgnoreCase(date_from_evet))
                 {
                       Log.d("receiver ","date equal");
+
 
                 }
             }

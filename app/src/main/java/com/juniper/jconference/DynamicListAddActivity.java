@@ -61,6 +61,7 @@ public class DynamicListAddActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 121;
     private static int BASIC_NOTIFICATION_ID = 100;
     TextView t_year, t_hour, day, t_date, nomeetings;
+    HashSet<ArrayList<CallModel>> setremovedup=new HashSet<>();
     ArrayList<CallModel> conference_call_model = new ArrayList<>();
     ArrayList<CallModel> conference_call_model1 = new ArrayList<>();
     String devicedate;
@@ -112,6 +113,7 @@ public class DynamicListAddActivity extends AppCompatActivity {
                // .defaultSelectedDate(defaultDate.getTime())
                 .textColor(Color.LTGRAY, Color.WHITE)
                 .selectedDateBackground(Color.TRANSPARENT)
+                .selectorColor(Color.WHITE)
                 .build();
 
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
@@ -161,15 +163,8 @@ public class DynamicListAddActivity extends AppCompatActivity {
         devicedate = formatter.format(today).replace("/"," ");
         // Log.v(TAG,"date check=="+devicedate);
         //readInstances(devicedate);
-        Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
 
-        if (!cursor.moveToFirst() || cursor.getCount() == 0){
-            //  Log.v(TAG,"inside on resume of .moveToFirst");
-            insertDataToDb(devicedate);
-        }else{
-
-        }
-
+        //readEventsFromDB(devicedate);
 
     }
 
@@ -190,13 +185,16 @@ public class DynamicListAddActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.v(TAG,"resume");
-       // readCurrentEventsFromCallender(devicedate);
-       // readCurrentEventsFromCallender();
+      //
+        Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
 
-
-
+        if (!cursor.moveToFirst() || cursor.getCount() == 0){
+            Log.v(TAG,"inside on resume of .moveToFirst");
+            insertDataToDb(devicedate);
+        }else{
+            readEventsFromDB(devicedate);
+        }
         readEventsFromDB(devicedate);
-        //loadMeetingFromDB(devicedate);
         PendingIntent service = null;
         Intent intentForService = new Intent(this.getApplicationContext(), EventsService.class);
         final AlarmManager alarmManager = (AlarmManager) this
@@ -211,7 +209,7 @@ public class DynamicListAddActivity extends AppCompatActivity {
         }
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime().getTime(), 60, service);
-            startService(intentForService);
+           // startService(intentForService);
 
 
 
@@ -342,7 +340,8 @@ public class DynamicListAddActivity extends AppCompatActivity {
         // Log.i(TAG, "1");
         conference_call_model.clear();
         //  Log.i(TAG, "2");
-        Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
+      String[] column=  new String[] {"Distinct "+ EventsDBHelper.KEY_CURRE_EVENT,EventsDBHelper.KEY_CURRE_DATE_TIME,EventsDBHelper.KEY_CURRE_DETAILS};
+        Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, column, null, null, null, null);
         if (cursor!=null) {
             //  Log.i(TAG, "3");
             if (cursor.moveToFirst()) {
@@ -373,6 +372,12 @@ public class DynamicListAddActivity extends AppCompatActivity {
                         model.setTimezone("(" +eventdateandtime.substring(20, 29) + ")");
                         model.setDate(eventdateandtime.substring(0, 10) + " " + eventdateandtime.substring(30, 34));
 
+                        String[] questionMarkTokens = eventdetails.split("Join online meeting");
+                        String beforeQuestionMark = questionMarkTokens[0];
+                       // beforeQuestionMark.replace("."," ");
+                        model.setDetails(eventdetails);
+
+                        Log.i(TAG, "details: " + beforeQuestionMark.replace(".",""));
                         // dataAndTimeList.add((new Date(cursor.getLong(3))).toString());
                         model.setDateandtime(eventdateandtime);
                         if (getConferenceId(eventdetails) != null) {
@@ -566,10 +571,8 @@ public class DynamicListAddActivity extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
 
-                   // readCurrentEventsFromCallender();
-                    // readEventsFromCallender();
-                   // retriveReminder();
-                    ;
+                    readEventsFromDB(devicedate);
+
                 } else {
                     //code for deny
                 }
@@ -634,7 +637,11 @@ public class DynamicListAddActivity extends AppCompatActivity {
                         model.setTime((new Date(instance_cursor.getLong(3))).toString().substring(11, 16));
                         model.setTimezone("(" + (new Date(instance_cursor.getLong(3))).toString().substring(20, 29) + ")");
                         model.setDate((new Date(instance_cursor.getLong(3))).toString().substring(0, 10) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(30, 34));
+                       // String[] questionMarkTokens= instance_cursor.getString(2).split(".........................................................................................................................................");
 
+                       // String beforeQuestionMark = questionMarkTokens[0];
+                        // beforeQuestionMark.replace("."," ");
+                        model.setDetails(instance_cursor.getString(2));
                         // dataAndTimeList.add((new Date(cursor.getLong(3))).toString());
                         model.setDateandtime((new Date(instance_cursor.getLong(3))).toString());
                         if (getConferenceId(instance_cursor.getString(2)) != null) {

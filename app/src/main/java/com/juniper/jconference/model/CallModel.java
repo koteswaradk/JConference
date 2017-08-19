@@ -11,6 +11,16 @@ public class CallModel {
     private ArrayList<String> numberList;
     private String conference;
     private String date;
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    private String details;
     private String time;
     private String timezone;
     public String getPhNumber() {
