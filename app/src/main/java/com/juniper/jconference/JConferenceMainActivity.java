@@ -184,7 +184,7 @@ public class JConferenceMainActivity extends AppCompatActivity {
                     intentForService, PendingIntent.FLAG_CANCEL_CURRENT);
         }
 
-       // alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime().getTime(), 60, service);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime().getTime(), 60, service);
 
         refreah_button.setOnClickListener(new View.OnClickListener() {
             @Override

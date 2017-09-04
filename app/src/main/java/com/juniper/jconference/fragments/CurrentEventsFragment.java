@@ -3,6 +3,7 @@ package com.juniper.jconference.fragments;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,7 +32,9 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.juniper.jconference.JDialerMainActivity;
 import com.juniper.jconference.R;
 import com.juniper.jconference.adapter.ListviewInsideListAdapter;
+import com.juniper.jconference.db.EventsDBHelper;
 import com.juniper.jconference.model.CallModel;
+import com.juniper.jconference.provider.Provider;
 import com.juniper.jconference.service.EventsService;
 
 import java.text.ParseException;
@@ -177,8 +180,8 @@ public class CurrentEventsFragment extends Fragment {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
          devicedate = formatter.format(today).replace("/"," ");
        // Log.v(TAG,"date check=="+devicedate);
-        readCurrentEventsFromCallender();
-
+       // readCurrentEventsFromCallender();
+        horizontalCalendar.goToday(false);
     }
 
     @Override
@@ -205,14 +208,15 @@ public class CurrentEventsFragment extends Fragment {
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @Override
             public void onDateSelected(Date date, int position) {
-                Date today = Calendar.getInstance().getTime();
+               // Date today = Calendar.getInstance().getTime();
 
                 SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
                 String datefrompicker = formatter.format(date);
-                String datefromsystem = formatter.format(today);
+               // String datefromsystem = formatter.format(today);
                // Log.v(TAG,datefrompicker);
                // Log.v(TAG,datefromsystem);
-                loadMeetingOnDateRequest(datefrompicker);
+               // loadMeetingOnDateRequest(datefrompicker);
+                loadMeetingFromDB(datefrompicker);
             }
 
         });
@@ -220,7 +224,157 @@ public class CurrentEventsFragment extends Fragment {
 
 
     }
+    private void loadMeetingFromDB(String datafromcallandar){
+       // mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
 
+        //  Log.d("service",""+devicedate);
+        Cursor cursor = getActivity().getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
+        if (cursor!=null) {
+            if (cursor.moveToFirst()) {
+                String date_from_evet =cursor.getString(
+                        cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+
+                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4,7)+" "+
+                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);
+                //   Log.d("service ","date_from_evet: "+date_from_evet);
+                if (datafromcallandar.equalsIgnoreCase(date_from_evet))
+                {
+                    readEventsFromDB(datafromcallandar);
+                     Log.d("service ","date equal");
+
+                }
+                if (!datafromcallandar.equalsIgnoreCase(date_from_evet))
+                {
+                    // readCurrentEventsFromCallender(datafromcallandar);
+                    readInstances(datafromcallandar);
+                     Log.d("service ","date not equal");
+
+                }
+            }
+        }
+
+    }
+    private void readInstances(String re_devicedate) {
+
+        conference_call_model.clear();
+        long now = System.currentTimeMillis();
+
+        Uri.Builder eventsUriBuilder = CalendarContract.Instances.CONTENT_URI.buildUpon();
+        ContentUris.appendId(eventsUriBuilder, Long.MIN_VALUE);
+        ContentUris.appendId(eventsUriBuilder, Long.MAX_VALUE);
+        String[] projection = new String[]{CalendarContract.Instances.CALENDAR_ID, CalendarContract.Instances.TITLE,
+                CalendarContract.Instances.DESCRIPTION, CalendarContract.Instances.BEGIN,
+                CalendarContract.Instances.END, CalendarContract.Instances.EVENT_LOCATION,
+                CalendarContract.Instances.EVENT_ID};
+
+        Uri eventsUri = eventsUriBuilder.build();
+        Cursor instance_cursor = getActivity().getContentResolver().query(
+                eventsUri, projection, CalendarContract.Instances.BEGIN + " >= " + now + " and " + CalendarContract.Instances.BEGIN
+                        + " <= " + (now + 2592000000L) + " and " + CalendarContract.Instances.VISIBLE + " = 1",
+                null, CalendarContract.Instances.DTSTART + " ASC");
+
+        try {
+
+            if (instance_cursor != null) {
+                while (instance_cursor.moveToNext()) {
+                    // final String title = cursor.getString(0);
+                    //String evetdate = new Date(instance_cursor.getLong(3)).toString().substring(0, 3) + " " + new Date(instance_cursor.getLong(3)).toString().substring(8, 10) + " " + new Date(instance_cursor.getLong(3)).toString().substring(4, 7) + " " + new Date(instance_cursor.getLong(3)).toString().substring(30, 34);
+                    String date_from_evet =new Date(instance_cursor.getLong(3)).toString().substring(8,10)+" "+new Date(instance_cursor.getLong(3)).toString().substring(4,7)+" "+new Date(instance_cursor.getLong(3)).toString().substring(30,34);
+
+                    if (date_from_evet.equalsIgnoreCase(re_devicedate.replace("-", " "))) {
+              /* String title = instance_cursor.getString(1);
+                String details = instance_cursor.getString(2);
+                String date = new Date((instance_cursor.getLong(3))).toString();
+
+
+                final Date begin = new Date(instance_cursor.getLong(1));
+                final Date end = new Date(instance_cursor.getLong(2));
+                final Boolean allDay = !instance_cursor.getString(3).equals("0");
+
+
+                System.out.println("Title: " + title +"\n"+"details"+ details +"\n"+ " End: " + date+"\n" + " All Day: " + allDay);
+               // Log.d("Main Activty","--------------------------------------------------------------------------------------------");*/
+
+                        //  Log.d(TAG, "inside if instance");
+                        String title = instance_cursor.getString(1);
+                        CallModel model = new CallModel();
+                        model.setTitle(instance_cursor.getString(1));
+                        //  Log.i(TAG, "detailed: instance " + instance_cursor.getString(2));
+                        //print values on log
+                        //  Log.i(TAG, "title: " + title);
+                        // titleList.add(title);
+                        // Log.i(TAG, " instance date and time: " + (new Date(instance_cursor.getLong(3))).toString());
+                        //  Log.i(TAG, " instance date and time---: " + (new Date(instance_cursor.getLong(3))).toString().substring(0, 3) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(8, 10) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(4, 7) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(30, 34));
+                        // model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
+                        model.setTime((new Date(instance_cursor.getLong(3))).toString().substring(11, 16));
+                        model.setTimezone("(" + (new Date(instance_cursor.getLong(3))).toString().substring(20, 29) + ")");
+                        model.setDate((new Date(instance_cursor.getLong(3))).toString().substring(0, 10) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(30, 34));
+                        // String[] questionMarkTokens= instance_cursor.getString(2).split(".........................................................................................................................................");
+
+                        // String beforeQuestionMark = questionMarkTokens[0];
+                        // beforeQuestionMark.replace("."," ");
+                        model.setDetails(instance_cursor.getString(2));
+                        // dataAndTimeList.add((new Date(cursor.getLong(3))).toString());
+                        model.setDateandtime((new Date(instance_cursor.getLong(3))).toString());
+                        if (getConferenceId(instance_cursor.getString(2)) != null) {
+                            //  Log.d(TAG, "Conference ID" + getConferenceId(instance_cursor.getString(2)));
+                            model.setConference(getConferenceId(instance_cursor.getString(2)));
+                        }
+                        ArrayList<String> plist = extractPhoneNumber(instance_cursor.getString(2));
+                        // model.setPhNumber(cursor.getString(2));
+                        Set<String> hs = new HashSet<>();
+                        hs.addAll(plist);
+                        plist.clear();
+                        plist.addAll(hs);
+                        Collections.reverse(plist);
+                        model.setNumberList(plist);
+
+                        for (int i = 0; i < plist.size(); i++) {
+
+                            // Log.i(Tag+"Phone Number list",plist.get(i).replace(" ",""));
+                            model.setPhNumber(plist.get(i));
+                            // Log.i(TAG + "Phone Number ", plist.get(i));
+
+                        }
+                        conference_call_model.add(model);
+
+                        //  Log.i(Tag,"second parameter: "+ cursor.getString(2));
+                        //  Log.d(TAG, "-------------------------------------");
+                    }
+
+           /* adapter = new ListviewInsideListAdapter(getActivity(), conference_call_model);
+            listView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();*/
+                }
+
+                if (!conference_call_model.isEmpty()) {
+                    //  Log.d(TAG, "not empty-");
+                    listView.setVisibility(View.VISIBLE);
+                    nomeetings.setVisibility(View.GONE);
+                    adapter = new ListviewInsideListAdapter(getActivity(), conference_call_model);
+                    listView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                }
+                if (conference_call_model.isEmpty()) {
+                    //  Log.d(TAG, " empty-");
+                    listView.setVisibility(View.GONE);
+                    nomeetings.setVisibility(View.VISIBLE);
+                }
+            }else {
+
+            }
+
+        }
+        catch (Exception e) {
+
+        } finally {
+            try {
+                if (instance_cursor != null && !instance_cursor.isClosed())
+                    instance_cursor.close();
+
+            } catch (Exception ex) {
+            }
+        }
+    }
     private void loadMeetingOnDateRequest(String date) {
         String[] projection = new String[]{CalendarContract.Events.CALENDAR_ID, CalendarContract.Events.TITLE, CalendarContract.Events.DESCRIPTION, CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND, CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_LOCATION};
         Cursor cursor = null;
@@ -510,6 +664,7 @@ public class CurrentEventsFragment extends Fragment {
 
         }
     }
+
     public ArrayList<String>  extractPhoneNumber(String input){
 
         phonenumberList=new ArrayList<>();
@@ -569,6 +724,106 @@ public class CurrentEventsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+    public void readEventsFromDB(String currentdate) {
+        // Log.i(TAG, "1");
+        conference_call_model.clear();
+        //  Log.i(TAG, "2");
+        String[] column=  new String[] {"Distinct "+ EventsDBHelper.KEY_CURRE_EVENT,EventsDBHelper.KEY_CURRE_DATE_TIME,EventsDBHelper.KEY_CURRE_DETAILS};
+        Cursor cursor = getActivity().getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, column, null, null, null, null);
+        if (cursor!=null) {
+            //  Log.i(TAG, "3");
+            if (cursor.moveToFirst()) {
+                // Log.i(TAG, "4");
+                String date_from_evet =cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4,7)+" "+cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);
+                do {
+                  /*  Log.i(TAG, "event"+date_from_evet);
+                    Log.i(TAG, "device"+devicedate);*/
+                    // devicedate="06 Aug 2017";
+                    if (date_from_evet.equalsIgnoreCase(currentdate.replace("-"," "))){
+                        // Log.i(TAG, "6");
+                        CallModel model = new CallModel();
+                        String eventtitle = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT));
+                        String eventdateandtime = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME));
+                        String eventdetails = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DETAILS));
+
+                        model.setTitle(eventtitle);
+                       /* Log.i(TAG, "eventtitle: " + eventtitle);
+                        Log.i(TAG, "date and time: " + eventdateandtime);
+                        Log.i(TAG, "eventdetails: " + eventdetails);*/
+                        //print values on log
+
+                        // titleList.add(title);
+                        /*Log.i(TAG, "date and time: " + (new Date(cursor.getLong(3))).toString());*/
+                       /* Log.i(TAG, "date and time---: " + (new Date(cursor.getLong(3))).toString().substring(0,3)+" "+(new Date(cursor.getLong(3))).toString().substring(8,10)+" "+(new Date(cursor.getLong(3))).toString().substring(4,7)+" "+(new Date(cursor.getLong(3))).toString().substring(30,34));*/
+                        // model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
+                        model.setTime(eventdateandtime.substring(11, 16));
+                        model.setTimezone("(" +eventdateandtime.substring(20, 29) + ")");
+                        model.setDate(eventdateandtime.substring(0, 10) + " " + eventdateandtime.substring(30, 34));
+
+                        String[] questionMarkTokens = eventdetails.split("Join online meeting");
+                        String beforeQuestionMark = questionMarkTokens[0];
+                        // beforeQuestionMark.replace("."," ");
+                        model.setDetails(eventdetails);
+
+                        //  Log.i(TAG, "details: " + beforeQuestionMark.replace(".",""));
+                        // dataAndTimeList.add((new Date(cursor.getLong(3))).toString());
+                        model.setDateandtime(eventdateandtime);
+                        if (getConferenceId(eventdetails) != null) {
+                            // Log.d(TAG, "Conference ID" + getConferenceId(eventdetails));
+                            model.setConference(getConferenceId(eventdetails));
+                        }
+                        ArrayList<String> plist = extractPhoneNumber(eventdetails);
+                        // model.setPhNumber(cursor.getString(2));
+                        Set<String> hs = new HashSet<>();
+                        hs.addAll(plist);
+                        plist.clear();
+                        plist.addAll(hs);
+                        Collections.reverse(plist);
+                        model.setNumberList(plist);
+
+                        for (int i = 0; i < plist.size(); i++) {
+
+                            // Log.i(Tag+"Phone Number list",plist.get(i).replace(" ",""));
+                            model.setPhNumber(plist.get(i));
+                            // Log.i(TAG + "Phone Number ", plist.get(i));
+
+                        }
+
+
+                        /*HashSet<CallModel> modelHashSet=new HashSet<>();
+                        modelHashSet.addAll(conference_call_model);*/
+
+                        conference_call_model.add(model);
+
+                        /*Log.d("Title"+"date from cursor",eventtitle);
+                        Log.d("DateAndTime"+"from cursor",eventdateandtime);
+                        Log.d("deatils"+"from cursor",eventdetails);*/
+                    }
+
+
+
+                } while (cursor.moveToNext());
+
+                if (!conference_call_model.isEmpty()) {
+                    //  Log.d(TAG, "not empty-");
+                    listView.setVisibility(View.VISIBLE);
+                    nomeetings.setVisibility(View.GONE);
+                    adapter = new ListviewInsideListAdapter(getActivity(),conference_call_model);
+                    listView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                }
+                if (conference_call_model.isEmpty()) {
+                    //  Log.d(TAG, " empty-");
+                    listView.setVisibility(View.GONE);
+                    nomeetings.setVisibility(View.VISIBLE);
+                }
+            }
+        }if (cursor==null){
+            //  Log.d(TAG+"cursor==null","cursor==null");
+
+        }
+
     }
 
 }

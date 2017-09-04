@@ -12,6 +12,25 @@ public class CallModel {
     private String conference;
     private String date;
 
+    public String getLeadershipnumber() {
+        return leadershipnumber;
+    }
+
+    public void setLeadershipnumber(String leadershipnumber) {
+        this.leadershipnumber = leadershipnumber;
+    }
+
+    private String leadershipnumber;
+
+    public boolean isMeetJuniperPresent() {
+        return meetJuniperPresent;
+    }
+
+    public void setMeetJuniperPresent(boolean meetJuniperPresent) {
+        this.meetJuniperPresent = meetJuniperPresent;
+    }
+
+    private boolean meetJuniperPresent;
     public String getDetails() {
         return details;
     }

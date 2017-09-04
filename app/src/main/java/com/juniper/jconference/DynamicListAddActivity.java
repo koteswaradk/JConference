@@ -3,6 +3,7 @@ package com.juniper.jconference;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -33,9 +34,13 @@ import com.google.i18n.phonenumbers.PhoneNumberMatch;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.juniper.jconference.adapter.InnerCallAdapter;
 import com.juniper.jconference.adapter.ListviewInsideListAdapter;
+import com.juniper.jconference.adapter.TimeZoneCallAdapter;
 import com.juniper.jconference.db.EventsDBHelper;
 import com.juniper.jconference.model.CallModel;
 import com.juniper.jconference.provider.Provider;
+import com.juniper.jconference.receiver.OnBootReceiver;
+import com.juniper.jconference.receiver.RepeatAlaramBootReceiver;
+import com.juniper.jconference.receiver.RepeatingAlarmReceiver;
 import com.juniper.jconference.service.EventsService;
 
 import java.text.DateFormat;
@@ -58,6 +63,7 @@ import devs.mulham.horizontalcalendar.HorizontalCalendarListener;
 
 public class DynamicListAddActivity extends AppCompatActivity {
     String TAG = getClass().getSimpleName();
+
     public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 121;
     private static int BASIC_NOTIFICATION_ID = 100;
     TextView t_year, t_hour, day, t_date, nomeetings;
@@ -78,6 +84,7 @@ public class DynamicListAddActivity extends AppCompatActivity {
     public static ArrayList<String> descriptions = new ArrayList<String>();
     ImageButton refreah_button;
     ListviewInsideListAdapter adapter;
+    TimeZoneCallAdapter timezoneadapter;
     private HorizontalCalendar horizontalCalendar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +123,84 @@ public class DynamicListAddActivity extends AppCompatActivity {
                 .selectorColor(Color.WHITE)
                 .build();
 
-        horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+       // Log.v(TAG,"onstart");
+        timeDateUpadte();
+        TimeZone tz = TimeZone.getDefault();
+       // System.out.println("TimeZone   "+tz.getDisplayName(false, TimeZone.SHORT)+" Timezon id :: " +tz.getID());
+        Date today = Calendar.getInstance().getTime();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+        devicedate = formatter.format(today).replace("/"," ");
+      //  Log.v(TAG,"date check=="+devicedate);
+        horizontalCalendar.goToday(false);
+
+        devicedate = formatter.format(today).replace("/"," ");
+
+    }
+
+    private void timeDateUpadte() {
+        /*String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+        Log.e(TAG, mydate);
+
+        Log.e(TAG + "time single digits", mydate.substring(11, 11));
+        Calendar calendar = Calendar.getInstance();
+        int dayOfWeek = calendar.get(Calendar.getInstance().DAY_OF_WEEK);
+
+        t_date.setText(dayGenerate(dayOfWeek) + " " + mydate.substring(0, 6)+" "+mydate.substring(7, 11));
+        date_check=dayGenerate(dayOfWeek) + " " + mydate.substring(0, 6)+" " + mydate.substring(7, 11);*/
+        Date today = Calendar.getInstance().getTime();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE/dd/MMM/yyyy");
+       //formatter.format(today).replace("/", " ");
+        t_date.setText(formatter.format(today).replace("/", " "));
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+      //  Log.v(TAG,"resume");
+      //
+        Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
+
+        if (!cursor.moveToFirst() || cursor.getCount() == 0){
+          //  Log.v(TAG,"inside on resume of .moveToFirst");
+            insertDataToDb(devicedate);
+        }
+       /* else{
+           // updateDBFromServer();
+            readEventsFromDB(devicedate);
+        }*/
+        readEventsFromDB(devicedate);
+
+
+        /*PendingIntent service = null;
+        Intent intentForService = new Intent(this.getApplicationContext(), EventsService.class);
+        final AlarmManager alarmManager = (AlarmManager) this
+                .getSystemService(Context.ALARM_SERVICE);
+        final Calendar time = Calendar.getInstance();
+        time.set(Calendar.MINUTE, 0);
+        time.set(Calendar.SECOND, 0);
+        time.set(Calendar.MILLISECOND, 0);
+        if (service == null) {
+            service = PendingIntent.getService(this, 0,
+                    intentForService, PendingIntent.FLAG_CANCEL_CURRENT);
+        }
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime().getTime(), 10000, service);*/
+
+       /* ComponentName receiver = new ComponentName(this, RepeatAlaramBootReceiver.class);
+        PackageManager pm = getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+*/
+       horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @Override
             public void onDateSelected(Date date, int position) {
                 // Date today = Calendar.getInstance().getTime();
@@ -145,74 +229,49 @@ public class DynamicListAddActivity extends AppCompatActivity {
 
             }
         });
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.v(TAG,"onstart");
-        timeDateUpadte();
+    }
+    private void updateDBFromServer(){
+        mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+//                    Log.d("raw",mydate.substring(0,26));
 
         Date today = Calendar.getInstance().getTime();
-
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
-        devicedate = formatter.format(today).replace("/"," ");
-        Log.v(TAG,"date check=="+devicedate);
-        horizontalCalendar.goToday(false);
+        String devicedate = formatter.format(today).replace("/", " ");
 
-        devicedate = formatter.format(today).replace("/"," ");
-        // Log.v(TAG,"date check=="+devicedate);
-        //readInstances(devicedate);
-
-        //readEventsFromDB(devicedate);
-
-    }
-
-    private void timeDateUpadte() {
-        String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
-        Log.e(TAG, mydate);
-
-        Log.e(TAG + "time single digits", mydate.substring(11, 11));
-        Calendar calendar = Calendar.getInstance();
-        int dayOfWeek = calendar.get(Calendar.getInstance().DAY_OF_WEEK);
-
-        t_date.setText(dayGenerate(dayOfWeek) + " " + mydate.substring(0, 6)+" "+mydate.substring(7, 11));
-        date_check=dayGenerate(dayOfWeek) + " " + mydate.substring(0, 6)+" " + mydate.substring(7, 11);
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.v(TAG,"resume");
-      //
+        //  devicedate="15 Aug 2017";
+        // Log.d("receiver",""+devicedate);
         Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
+        if (cursor!=null) {
+            if (cursor.moveToFirst()) {
+                String date_from_evet =cursor.getString(
+                        cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+
+                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4,7)+" "+
+                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);
+                //   Log.d("service ","date_from_evet: "+date_from_evet);
+                if (!devicedate.equalsIgnoreCase(date_from_evet))
+                {
+                  //  Log.d("service ","date not equal");
+                    dropTable();
+                    insertDataToDb(devicedate);
 
-        if (!cursor.moveToFirst() || cursor.getCount() == 0){
-            Log.v(TAG,"inside on resume of .moveToFirst");
-            insertDataToDb(devicedate);
-        }else{
-            readEventsFromDB(devicedate);
+                }
+                if (devicedate.equalsIgnoreCase(date_from_evet))
+                {
+                  //  Log.d("receiver ","date equal");
+                    readEventsFromDB(devicedate);
+
+                }
+            }
         }
-        readEventsFromDB(devicedate);
-        PendingIntent service = null;
-        Intent intentForService = new Intent(this.getApplicationContext(), EventsService.class);
-        final AlarmManager alarmManager = (AlarmManager) this
-                .getSystemService(Context.ALARM_SERVICE);
-        final Calendar time = Calendar.getInstance();
-        time.set(Calendar.MINUTE, 0);
-        time.set(Calendar.SECOND, 0);
-        time.set(Calendar.MILLISECOND, 0);
-        if (service == null) {
-            service = PendingIntent.getService(this, 0,
-                    intentForService, PendingIntent.FLAG_CANCEL_CURRENT);
+
+    }
+    public void dropTable(){
+
+        int result1= getContentResolver().delete(Provider.CONTENT_CURRENT_EVENTS_URI,null,null);
+        if (result1!=0){
+            // Log.i(TAG,"rows affected"+result1);
         }
-
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime().getTime(), 60, service);
-           // startService(intentForService);
-
-
-
 
     }
     private void insertDataToDb(String device_date) {
@@ -275,12 +334,12 @@ public class DynamicListAddActivity extends AppCompatActivity {
                             selectedValues.put(EventsDBHelper.KEY_CURRE_DETAILS,details);
 
                             Uri selectedUri =getContentResolver().insert(Provider.CONTENT_CURRENT_EVENTS_URI, selectedValues);
-                            if (selectedUri!=null){
+                            /*if (selectedUri!=null){
                                 if (ContentUris.parseId(selectedUri)>0);
 
                             }else{
 
-                            }
+                            }*/
 
                             //readEventsFromcursor();
                         }
@@ -322,14 +381,14 @@ public class DynamicListAddActivity extends AppCompatActivity {
                 if (datafromcallandar.equalsIgnoreCase(date_from_evet))
                 {
                     readEventsFromDB(datafromcallandar);
-                    Log.d("service ","date equal");
+                   // Log.d("service ","date equal");
 
                 }
                 if (!datafromcallandar.equalsIgnoreCase(date_from_evet))
                 {
                    // readCurrentEventsFromCallender(datafromcallandar);
                     readInstances(datafromcallandar);
-                    Log.d("service ","date not equal");
+                   // Log.d("service ","date not equal");
 
                 }
             }
@@ -359,9 +418,9 @@ public class DynamicListAddActivity extends AppCompatActivity {
                         String eventdetails = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DETAILS));
 
                         model.setTitle(eventtitle);
-                       /* Log.i(TAG, "eventtitle: " + eventtitle);
-                        Log.i(TAG, "date and time: " + eventdateandtime);
-                        Log.i(TAG, "eventdetails: " + eventdetails);*/
+                      //  Log.i(TAG, "eventtitle: " + eventtitle);
+                       /* Log.i(TAG, "date and time: " + eventdateandtime);*/
+                        Log.i(TAG, "eventdetails: " + eventdetails);
                         //print values on log
 
                         // titleList.add(title);
@@ -377,7 +436,7 @@ public class DynamicListAddActivity extends AppCompatActivity {
                        // beforeQuestionMark.replace("."," ");
                         model.setDetails(eventdetails);
 
-                        Log.i(TAG, "details: " + beforeQuestionMark.replace(".",""));
+                      //  Log.i(TAG, "details: " + beforeQuestionMark.replace(".",""));
                         // dataAndTimeList.add((new Date(cursor.getLong(3))).toString());
                         model.setDateandtime(eventdateandtime);
                         if (getConferenceId(eventdetails) != null) {
@@ -421,8 +480,11 @@ public class DynamicListAddActivity extends AppCompatActivity {
                     listView.setVisibility(View.VISIBLE);
                     nomeetings.setVisibility(View.GONE);
                     adapter = new ListviewInsideListAdapter(this,conference_call_model);
+                   // timezoneadapter=new TimeZoneCallAdapter(this,conference_call_model);
                     listView.setAdapter(adapter);
+                   // listView.setAdapter(timezoneadapter);
                     adapter.notifyDataSetChanged();
+                   // timezoneadapter.notifyDataSetChanged();
                 }
                 if (conference_call_model.isEmpty()) {
                     //  Log.d(TAG, " empty-");
@@ -629,7 +691,7 @@ public class DynamicListAddActivity extends AppCompatActivity {
                         model.setTitle(instance_cursor.getString(1));
                         //  Log.i(TAG, "detailed: instance " + instance_cursor.getString(2));
                         //print values on log
-                        //  Log.i(TAG, "title: " + title);
+                         // Log.i(TAG, "title: " + title);
                         // titleList.add(title);
                         // Log.i(TAG, " instance date and time: " + (new Date(instance_cursor.getLong(3))).toString());
                         //  Log.i(TAG, " instance date and time---: " + (new Date(instance_cursor.getLong(3))).toString().substring(0, 3) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(8, 10) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(4, 7) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(30, 34));
@@ -780,21 +842,21 @@ public class DynamicListAddActivity extends AppCompatActivity {
                        // String date_from_evet=new Date(cursor.getLong(3)).toString().substring(0, 10) + " " + (new Date(cursor.getLong(3))).toString().substring(30, 34);
                       //  String date_from_evet =new Date(cursor.getLong(3)).toString().substring(0,3)+" "+new Date(cursor.getLong(3)).toString().substring(8,10)+" "+new Date(cursor.getLong(3)).toString().substring(4,7)+" "+new Date(cursor.getLong(3)).toString().substring(30,34);
                         String date_from_evet =new Date(cursor.getLong(3)).toString().substring(8,10)+" "+new Date(cursor.getLong(3)).toString().substring(4,7)+" "+new Date(cursor.getLong(3)).toString().substring(30,34);
-                        Log.d(TAG,"event date"+date_from_evet);
-                        Log.d(TAG," date of current"+device_date);
+                      //  Log.d(TAG,"event date"+date_from_evet);
+                      //  Log.d(TAG," date of current"+device_date);
                        // date_check="29 Jul 2017";
                         if (date_from_evet.equalsIgnoreCase(device_date.replace("-"," "))){
-                            Log.d(TAG,"inside if");
+                          //  Log.d(TAG,"inside if");
                             String title = cursor.getString(1);
                             CallModel model = new CallModel();
                             model.setTitle(cursor.getString(1));
-                            Log.i(TAG, "title: " + title);
-                            Log.i(TAG, "detailed: " + cursor.getString(2));
+                          //  Log.i(TAG, "title: " + title);
+                           // Log.i(TAG, "detailed: " + cursor.getString(2));
                             //print values on log
 
                             // titleList.add(title);
-                            Log.i(TAG, "date and time: " + (new Date(cursor.getLong(3))).toString());
-                            Log.i(TAG, "date and time---: " + (new Date(cursor.getLong(3))).toString().substring(0,3)+" "+(new Date(cursor.getLong(3))).toString().substring(8,10)+" "+(new Date(cursor.getLong(3))).toString().substring(4,7)+" "+(new Date(cursor.getLong(3))).toString().substring(30,34));
+                           // Log.i(TAG, "date and time: " + (new Date(cursor.getLong(3))).toString());
+                           // Log.i(TAG, "date and time---: " + (new Date(cursor.getLong(3))).toString().substring(0,3)+" "+(new Date(cursor.getLong(3))).toString().substring(8,10)+" "+(new Date(cursor.getLong(3))).toString().substring(4,7)+" "+(new Date(cursor.getLong(3))).toString().substring(30,34));
                             // model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
                             model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
                             model.setTimezone("(" + (new Date(cursor.getLong(3))).toString().substring(20, 29) + ")");
@@ -803,7 +865,7 @@ public class DynamicListAddActivity extends AppCompatActivity {
                             // dataAndTimeList.add((new Date(cursor.getLong(3))).toString());
                             model.setDateandtime((new Date(cursor.getLong(3))).toString());
                             if (getConferenceId(cursor.getString(2)) != null) {
-                                Log.d(TAG, "Conference ID" + getConferenceId(cursor.getString(2)));
+                              //  Log.d(TAG, "Conference ID" + getConferenceId(cursor.getString(2)));
                                 model.setConference(getConferenceId(cursor.getString(2)));
                             }
                             ArrayList<String> plist = extractPhoneNumber(cursor.getString(2));
@@ -819,14 +881,14 @@ public class DynamicListAddActivity extends AppCompatActivity {
 
                                 // Log.i(Tag+"Phone Number list",plist.get(i).replace(" ",""));
                                 model.setPhNumber(plist.get(i));
-                                Log.i(TAG + "Phone Number ", plist.get(i));
+                               // Log.i(TAG + "Phone Number ", plist.get(i));
 
                             }
 
                            // conference_call_model.add(model);
 
                             //  Log.i(Tag,"second parameter: "+ cursor.getString(2));
-                            Log.d(TAG, "-------------------------------------");
+                           // Log.d(TAG, "-------------------------------------");
                         }
 
                     } while (cursor.moveToNext());
@@ -1019,19 +1081,19 @@ public class DynamicListAddActivity extends AppCompatActivity {
                     do {
                         // String date_from_evet=new Date(cursor.getLong(3)).toString().substring(0, 10) + " " + (new Date(cursor.getLong(3))).toString().substring(30, 34);
                         String date_from_evet = new Date(cursor.getLong(3)).toString().substring(0, 3) + " " + new Date(cursor.getLong(3)).toString().substring(8, 10) + " " + new Date(cursor.getLong(3)).toString().substring(4, 7) + " " + new Date(cursor.getLong(3)).toString().substring(30, 34);
-                        Log.d(TAG, "event date" + date_from_evet);
-                        Log.d(TAG, " date of current" + date_check);
+                      //  Log.d(TAG, "event date" + date_from_evet);
+                      //  Log.d(TAG, " date of current" + date_check);
                         if (date_from_evet.equalsIgnoreCase(date_check)) {
-                            Log.d(TAG, "inside if");
+                          //  Log.d(TAG, "inside if");
                             String title = cursor.getString(1);
                             CallModel model = new CallModel();
                             model.setTitle(cursor.getString(1));
-                            Log.i(TAG, "detailed: " + cursor.getString(2));
+                           // Log.i(TAG, "detailed: " + cursor.getString(2));
                             //print values on log
-                            Log.i(TAG, "title: " + title);
+                           // Log.i(TAG, "title: " + title);
                             // titleList.add(title);
-                            Log.i(TAG, "date and time: " + (new Date(cursor.getLong(3))).toString());
-                            Log.i(TAG, "date and time---: " + (new Date(cursor.getLong(3))).toString().substring(0, 3) + " " + (new Date(cursor.getLong(3))).toString().substring(8, 10) + " " + (new Date(cursor.getLong(3))).toString().substring(4, 7) + " " + (new Date(cursor.getLong(3))).toString().substring(30, 34));
+                           // Log.i(TAG, "date and time: " + (new Date(cursor.getLong(3))).toString());
+                           // Log.i(TAG, "date and time---: " + (new Date(cursor.getLong(3))).toString().substring(0, 3) + " " + (new Date(cursor.getLong(3))).toString().substring(8, 10) + " " + (new Date(cursor.getLong(3))).toString().substring(4, 7) + " " + (new Date(cursor.getLong(3))).toString().substring(30, 34));
                             // model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
                             model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
                             model.setTimezone("(" + (new Date(cursor.getLong(3))).toString().substring(20, 29) + ")");

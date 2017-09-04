@@ -5,7 +5,7 @@
     <string name="re_no_today_meeting">Today No Meeting Scheduled/May Completed Already</string>
     <string name="recursive_meting_title">Recurrence Meetings</string>
     <string name="meeting_text">Meeting: </string>
-    <string name="phone_number">Num:</string>
+    <string name="phone_location">location:</string>
     <string name="confid">Conference ID:</string>
 
     <!-- TODO: Remove or change this placeholder text -->

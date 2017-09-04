@@ -39,6 +39,8 @@ import com.juniper.jconference.db.EventsDBHelper;
 import com.juniper.jconference.model.CallModel;
 import com.juniper.jconference.provider.Provider;
 import com.juniper.jconference.receiver.EventsReceiver;
+import com.juniper.jconference.receiver.OnBootReceiver;
+import com.juniper.jconference.receiver.RepeatingAlarmReceiver;
 import com.juniper.jconference.receiver.ScreenOFFONReceiver;
 
 
@@ -58,26 +60,56 @@ public class EventsService extends Service {
     public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 121;
     private static final String TAG = "EventsService";
     Context context;
-
+    NotificationManager mNotificationManager;
     String event_title="No_Event_Available",date_month_year_time,timezone="", s_hour,s_minuite;;
     String device_date_month_year_time;
     ArrayList<String>phonenumberList;
     String mydate,devicedate;
     ArrayList<String>callist;
+    Notification barNotif;
     public EventsService() {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-
         super.onStartCommand(intent, flags, startId);
-        Log.i(TAG,"onStartCommand");
+       // Log.i(TAG,"onStartCommand");
 
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+        String localdevicedate = formatter.format(today).replace("/", " ");
+      //  Log.i("eee",localdevicedate);
+       /* mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Intent bIntent = new Intent(this, DynamicListAddActivity.class);
+        PendingIntent pbIntent = PendingIntent.getActivity(this, 0 , bIntent, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        NotificationCompat.Builder bBuilder =
+                (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.viber)
+                        .setContentTitle("JDialer")
+                        .setOngoing(true)
+                        .setAutoCancel(false)
+                        .setContentIntent(pbIntent);
+        barNotif = bBuilder.build();
+        barNotif.flags=Notification.FLAG_ONGOING_EVENT;
+        barNotif.flags=Notification.FLAG_NO_CLEAR;
+        this.startForeground(1, barNotif);*/
+      //  broadcastData(localdevicedate);
         updateDBFromServer();
         return START_STICKY;
     }
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // REGISTER RECEIVER THAT HANDLES SCREEN ON AND SCREEN OFF LOGIC
+        IntentFilter filter = new IntentFilter(Intent.ACTION_USER_PRESENT);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        BroadcastReceiver mReceiver = new ScreenOFFONReceiver();
+        registerReceiver(mReceiver, filter);
 
-    private void dbCheck() {
+    }
+   /* private void dbCheck() {
         Date today = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
         String devicedate = formatter.format(today).replace("/", " ");
@@ -87,8 +119,18 @@ public class EventsService extends Service {
 
 
 
-    }
+    }*/
 
+  private void broadcastData(String data){
+     // Log.i("eee1",data);
+      Intent broadcastIntent = new Intent("com.juniper.jconference.receiver.EventsReceiver");
+      broadcastIntent.setClass(this, EventsReceiver.class);
+      broadcastIntent.putExtra("date",data);
+
+      sendBroadcast(broadcastIntent);
+     /* sendBroadcast(new Intent(this, OnBootReceiver.class));
+      sendBroadcast(new Intent(this, RepeatingAlarmReceiver.class));*/
+   }
     private ArrayList<String> readCalendarList(String device_date) {
 
 
@@ -205,15 +247,8 @@ public class EventsService extends Service {
       //  return al;
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        // REGISTER RECEIVER THAT HANDLES SCREEN ON AND SCREEN OFF LOGIC
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
-        BroadcastReceiver mReceiver = new ScreenOFFONReceiver();
-        registerReceiver(mReceiver, filter);
-    }
+
+
 
     private void updateDBFromServer(){
       //  mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
@@ -224,49 +259,56 @@ public class EventsService extends Service {
         String devicedate = formatter.format(today).replace("/", " ");
         //  Log.d("service",""+devicedate);
         // Log.i(TAG, "selection");
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+        try{
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_CALENDAR},
-                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
-        if (cursor!=null) {
-            if (cursor.moveToFirst()) {
-                do {
-                    String date_from_evet =cursor.getString(
-                            cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+
-                            cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4,7)+" "+
-                            cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);
-                    //   Log.d("service ","date_from_evet: "+date_from_evet);
-                    if (devicedate.equalsIgnoreCase(date_from_evet))
-                    {
-
-                        if (!geTitleFromDB().contains(geTitleFromCallender(devicedate))){
-
-                            insertDataToDb(devicedate,geTitleFromCallender(devicedate));
-                           // readCurrentEventsFromCallender(devicedate);
-
-                        }else{
-                            // Log.i("out side",geTitleFromCallender(devicedate));
-                        }
-
-
-
-                    }
-                }while (cursor.moveToNext());
-
+                ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_CALENDAR},
+                        MY_PERMISSIONS_REQUEST_READ_CALENDAR);
             }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
+            if (cursor!=null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        String date_from_evet =cursor.getString(
+                                cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+
+                                cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4,7)+" "+
+                                cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);
+                        //   Log.d("service ","date_from_evet: "+date_from_evet);
+                        if (devicedate.equalsIgnoreCase(date_from_evet))
+                        {
+                            try {
+                                if (!geTitleFromDB().contains(geTitleFromCallender(devicedate))) {
+
+                                    insertDataToDb(devicedate, geTitleFromCallender(devicedate));
+                                    // readCurrentEventsFromCallender(devicedate);
+
+                                } else {
+                                    // Log.i("out side",geTitleFromCallender(devicedate));
+                                }
+
+
+                            }catch (NullPointerException e){
+
+                            }
+                        }
+                    }while (cursor.moveToNext());
+
+                }
+            }
+        }catch (NullPointerException e){
+
         }
+
 
     }
 
@@ -319,7 +361,7 @@ public class EventsService extends Service {
                             String details =cursor.getString(2);
                             String date_and_time_full= new Date((cursor.getLong(3))).toString();
                             //  Log.i(TAG,"insert date and time "+date_and_time_full);
-                             Log.d(TAG,"insert titles"+titles);
+                           //  Log.d(TAG,"insert titles"+titles);
                             //  Log.d(TAG,"insert details"+details);
                             // Log.d(TAG, "-------------------------------------");
                             ContentValues selectedValues = new ContentValues();
@@ -636,7 +678,7 @@ public class EventsService extends Service {
        }*//*
 
     }*/
-    /*public void readCurrentEventsFromCallender() {
+  /*  public void readCurrentEventsFromCallender() {
         String[] projection = new String[]{CalendarContract.Events.CALENDAR_ID, CalendarContract.Events.TITLE, CalendarContract.Events.DESCRIPTION, CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND, CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_LOCATION};
 
         // 0 = January, 1 = February, ...
@@ -734,8 +776,8 @@ public class EventsService extends Service {
                     if (DateFormat.is24HourFormat(this)){
 
                         device_date_month_year_time=mydate.substring(0, 17);
-                       *//* Log.i("inside is 24",device_date_month_year_time);
-                        Log.i("------------",mydate.substring(11,16));*//*
+                        Log.i("inside is 24",device_date_month_year_time);
+                        Log.i("------------",mydate.substring(11,16));
                         if (mydate.substring(11,16).toString().equalsIgnoreCase("24:00")||mydate.substring(11,16).toString().equalsIgnoreCase("24:01")||mydate.substring(11,16).toString().equalsIgnoreCase("24:02")||mydate.substring(11,16).toString().equalsIgnoreCase("24:03")||mydate.substring(11,16).toString().equalsIgnoreCase("24:04")||mydate.substring(11,16).toString().equalsIgnoreCase("24:05"))
                         {
                             Date today = Calendar.getInstance().getTime();

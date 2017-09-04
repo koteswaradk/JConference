@@ -38,7 +38,7 @@ public class EventsDBHelper extends SQLiteOpenHelper{
 
     //CREATE TABLE CURRENT_EVENTS_DETAILS
     private static final String CREATE_TABLE_EVENTS_DETAILS = "CREATE TABLE "
-            + EVENTS_TABLE + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_TIME
+            + EVENTS_TABLE + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE," + KEY_TIME
             + " TEXT," + KEY_DATE + " TEXT," + KEY_EVENT
             + " TEXT," + KEY_CONFIG_ID + " TEXT,"
             + KEY_TELEPHONE_NUMBERS + " TEXT" + ")";

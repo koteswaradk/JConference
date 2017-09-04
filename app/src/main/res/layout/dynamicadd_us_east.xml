@@ -7,7 +7,6 @@
         android:layout_height="1dp"
         android:layout_gravity="center"
         android:background="#D3D3D3" />
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,33 +15,33 @@
         <LinearLayout
 
 
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:orientation="horizontal">
 
             <LinearLayout
 
+
+                android:layout_marginLeft="3dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="3dp"
-                android:orientation="horizontal"
-                android:padding="0dp">
+                android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/display_place"
-                    android:textSize="12sp"
+                    android:id="@+id/us_east_display_place"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="12sp"
                     android:text="@string/phone_location" />
 
                 <TextView
-                    android:id="@+id/dialnumber_display"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/us_east_dialnumber_display"
+                    android:visibility="visible"
                     android:textSize="12sp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:visibility="visible" />
+                    android:text="" />
 
             </LinearLayout>
 
@@ -50,26 +49,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="0dp">
+                >
 
                 <TextView
-                    android:id="@+id/conferenceid"
+                    android:id="@+id/us_east_conferenceid"
+                    android:visibility="visible"
+                    android:textSize="12sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=";"
-                    android:textSize="12sp"
-                    android:visibility="visible" />
+                    android:text=";" />
 
                 <TextView
-                    android:id="@+id/conferenceid_display"
+                    android:id="@+id/us_east_conferenceid_display"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
+                    android:visibility="visible"
                     android:textSize="12sp"
-                    android:visibility="visible" />
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
 
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -77,7 +76,7 @@
                 android:padding="0dp">
 
                 <TextView
-                    android:id="@+id/leadership"
+                    android:id="@+id/us_east_leadership"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
@@ -85,7 +84,7 @@
                     android:visibility="visible" />
 
                 <TextView
-                    android:id="@+id/leadership_display"
+                    android:id="@+id/us_east_leadership_display"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
@@ -99,17 +98,18 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="5dp">
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            >
 
             <ImageButton
-                android:id="@+id/ib_call"
+                android:padding="5dp"
+                android:id="@+id/east_ib_call"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:background="@drawable/call_selector"
-                android:padding="5dp" />
+                android:background="@drawable/call_selector" />
         </RelativeLayout>
 
     </LinearLayout>

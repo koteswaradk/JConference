@@ -12,79 +12,49 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import com.juniper.jconference.adapter.ListviewInsideListAdapter;
 import com.juniper.jconference.db.EventsDBHelper;
 import com.juniper.jconference.model.CallModel;
 import com.juniper.jconference.provider.Provider;
 import com.juniper.jconference.service.EventsService;
-import com.juniper.jconference.util.ConnectionDetector;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
-public class ScreenOFFONReceiver extends BroadcastReceiver {
-    private String TAG="ScreenOFFONReceiver";
-    public static boolean wasScreenOn = true;
-    public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 121;
-    String time;
+public class RepeatAlaramBootReceiver extends BroadcastReceiver {
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
+    Context racontext;
     String mydate;
-    Context receivercontext;
+    public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 123;
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
+        racontext=context;
         // an Intent broadcast.
-        this.receivercontext=context;
-        if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-            // DO WHATEVER YOU NEED TO DO HERE
-           // System.out.println("SCREEN TURNED OFF");
-            wasScreenOn = false;
-            PendingIntent service = null;
-            /*Intent intentForService = new Intent(context.getApplicationContext(), EventsService.class);
-            final AlarmManager alarmManager = (AlarmManager)
-            context.getSystemService(Context.ALARM_SERVICE);
-            final Calendar time = Calendar.getInstance();
-            time.set(Calendar.MINUTE, 0);
-            time.set(Calendar.SECOND, 0);
-            time.set(Calendar.MILLISECOND, 0);
-            if (service == null) {
-                service = PendingIntent.getService(context, 0,
-                        intentForService, PendingIntent.FLAG_CANCEL_CURRENT);
-            }
-
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime().getTime(), 60, service);
-            receivercontext.startService(intentForService);*/
-
-        }  if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
-            // AND DO WHATEVER YOU NEED TO DO HERE
-          //  System.out.println("USER PRESENT");
-            wasScreenOn = true;
+        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+            // Set the alarm here.
+            // Set the alarm to start at approximately 2:00 p.m.
+            alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+            Intent intentservice = new Intent(racontext, EventsService.class);
+            alarmIntent = PendingIntent.getBroadcast(racontext, 0, intentservice, 0);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(Calendar.HOUR_OF_DAY, 5);
             updateDBFromCalendar();
-          //  Toast.makeText(receivercontext,"userpresent",Toast.LENGTH_SHORT).show();
-
-        } if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-            // AND DO WHATEVER YOU NEED TO DO HERE
-           // System.out.println("SCREEN TURNED ON");
-            wasScreenOn = true;
-           // updateDBFromCalendar();
-
-
+            Log.i("Repeat","set repeat");
+    // With setInexactRepeating(), you have to use one of the AlarmManager interval
+    // constants--in this case, AlarmManager.INTERVAL_DAY.
+            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY, alarmIntent);
 
         }
     }
-
     private void updateDBFromCalendar(){
         mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
 //                    Log.d("raw",mydate.substring(0,26));
@@ -93,9 +63,9 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
         String devicedate = formatter.format(today).replace("/", " ");
 
-      //  devicedate="15 Aug 2017";
-       // Log.d("receiver",""+devicedate);
-        Cursor cursor = receivercontext.getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
+        //  devicedate="15 Aug 2017";
+        Log.d("Repeat",""+devicedate);
+        Cursor cursor = racontext.getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
         if (cursor!=null) {
             if (cursor.moveToFirst()) {
                 String date_from_evet =cursor.getString(
@@ -105,7 +75,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
                 //   Log.d("service ","date_from_evet: "+date_from_evet);
                 if (!devicedate.equalsIgnoreCase(date_from_evet))
                 {
-                     // Log.d("service ","date not equal");
+                    Log.d("Repeat ","date not equal");
                     dropTable();
                     insertDataToDb(devicedate);
                     readEventsFromDB(devicedate);
@@ -113,7 +83,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
                 }
                 if (devicedate.equalsIgnoreCase(date_from_evet))
                 {
-                     // Log.d("receiver ","date equal");
+                    Log.d("Repeat ","date equal");
 
 
                 }
@@ -125,12 +95,12 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
         // Uri  uri=null;
         long now = System.currentTimeMillis();
 
-        if (ContextCompat.checkSelfPermission(receivercontext, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(racontext, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions((Activity) receivercontext, new String[]{Manifest.permission.READ_CALENDAR},
+            ActivityCompat.requestPermissions((Activity) racontext, new String[]{Manifest.permission.READ_CALENDAR},
                     MY_PERMISSIONS_REQUEST_READ_CALENDAR);
         }
-        if (ActivityCompat.checkSelfPermission(receivercontext, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(racontext, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -150,7 +120,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
                 CalendarContract.Instances.EVENT_ID};
 
         Uri eventsUri = eventsUriBuilder.build();
-        Cursor cursor = receivercontext.getContentResolver().query(
+        Cursor cursor = racontext.getContentResolver().query(
                 eventsUri, projection, CalendarContract.Instances.BEGIN + " >= " + now + " and " + CalendarContract.Instances.BEGIN
                         + " <= " + (now + 2592000000L) + " and " + CalendarContract.Instances.VISIBLE + " = 1",
                 null, CalendarContract.Instances.DTSTART + " ASC");
@@ -165,7 +135,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
 
                         // String date_from_evet=new Date(cursor.getLong(3)).toString().substring(0, 10) + " " + (new Date(cursor.getLong(3))).toString().substring(30, 34);
                         String date_from_evet =new Date(cursor.getLong(3)).toString().substring(8,10)+" "+new Date(cursor.getLong(3)).toString().substring(4,7)+" "+new Date(cursor.getLong(3)).toString().substring(30,34);
-                      //  Log.i("ScreenOFFONReceiver","device_date "+device_date);
+                        Log.i("Repeat","device_date "+device_date);
                         // device_date="06 Aug 2017";
                         //  Log.i(TAG,"date_from_evet"+date_from_evet);
                         if (date_from_evet.equalsIgnoreCase(device_date.replace("-"," "))){
@@ -182,7 +152,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
                             selectedValues.put(EventsDBHelper.KEY_CURRE_EVENT, titles);
                             selectedValues.put(EventsDBHelper.KEY_CURRE_DETAILS,details);
 
-                            Uri selectedUri = receivercontext.getContentResolver().insert(Provider.CONTENT_CURRENT_EVENTS_URI, selectedValues);
+                            Uri selectedUri = racontext.getContentResolver().insert(Provider.CONTENT_CURRENT_EVENTS_URI, selectedValues);
                             if (selectedUri!=null){
                                 if (ContentUris.parseId(selectedUri)>0);
 
@@ -215,7 +185,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
     }
     public void dropTable(){
 
-        int result1= receivercontext.getContentResolver().delete(Provider.CONTENT_CURRENT_EVENTS_URI,null,null);
+        int result1= racontext.getContentResolver().delete(Provider.CONTENT_CURRENT_EVENTS_URI,null,null);
         if (result1!=0){
             // Log.i(TAG,"rows affected"+result1);
         }
@@ -226,7 +196,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
 
         //  Log.i(TAG, "2");
         String[] column=  new String[] {"Distinct "+ EventsDBHelper.KEY_CURRE_EVENT,EventsDBHelper.KEY_CURRE_DATE_TIME,EventsDBHelper.KEY_CURRE_DETAILS};
-        Cursor cursor = receivercontext.getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, column, null, null, null, null);
+        Cursor cursor = racontext.getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, column, null, null, null, null);
         if (cursor!=null) {
             //  Log.i(TAG, "3");
             if (cursor.moveToFirst()) {
@@ -244,9 +214,9 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
                         String eventdetails = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DETAILS));
 
                         model.setTitle(eventtitle);
-                      /*  Log.i(TAG, "eventtitle: " + eventtitle);
-                        Log.i(TAG, "date and time: " + eventdateandtime);
-                        Log.i(TAG, "eventdetails: " + eventdetails);*/
+                        Log.i("Repeat", "eventtitle: " + eventtitle);
+                        Log.i("Repeat", "date and time: " + eventdateandtime);
+                        Log.i("Repeat", "eventdetails: " + eventdetails);
                         //print values on log
 
                         model.setTime(eventdateandtime.substring(11, 16));
@@ -258,7 +228,7 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
                         // beforeQuestionMark.replace("."," ");
                         model.setDetails(eventdetails);
 
-                       // Log.i(TAG, "details: " + beforeQuestionMark.replace(".",""));
+                        // Log.i(TAG, "details: " + beforeQuestionMark.replace(".",""));
                         // dataAndTimeList.add((new Date(cursor.getLong(3))).toString());
                         model.setDateandtime(eventdateandtime);
 
@@ -280,5 +250,4 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
         }
 
     }
-
 }
