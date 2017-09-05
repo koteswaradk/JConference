@@ -73,7 +73,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         number_place_map.put("+18446454399","USA East Coast");
         number_place_map.put("+14089369000","USA West Coast");
         number_place_map.put("+18446454398","USA West Coast");
-        number_place_map.put("+18002660323","India Bangalore");
+        number_place_map.put("+18002660323","USA West Coast");
 
 
         Collections.sort(this.eventlist, new ListviewInsideListAdapter.TimeComparator());
@@ -217,9 +217,15 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
                 if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA East Coast")) {
                     holder.dialnumber_display.setText("+18446454399");
+                    String s1=holder.display_place.getText().toString();
+                    String s2=s1.concat(" (TollFree)");
+                    holder.display_place.setText(s2);
                 }
                 if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA West Coast")) {
                     holder.dialnumber_display.setText("+18446454398");
+                    String s3=holder.display_place.getText().toString();
+                    String s4=s3.concat(" (TollFree)");
+                    holder.display_place.setText(s4);
                 }
                 if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("India Bangalore")) {
                     holder.dialnumber_display.setText("18002660610");
@@ -227,11 +233,47 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             }catch (NullPointerException e){
 
             }
+
+
             if ((holder.dialnumber_display.getText().toString().equalsIgnoreCase("18002660323"))){
-                holder.dialnumber_display.setText("18002660610");
+                holder.dialnumber_display.setText("+18446454398");
                 holder.display_place.setText(number_place_map.get(holder.dialnumber_display.getText().toString()));
-                // Log.v("fff",holder.dialnumber_display.getText().toString()+""+ holder.location_display.getText().toString());
-                // holder.dialnumber_display.setText(18002660610)
+                String s3=holder.display_place.getText().toString();
+                String s4=s3.concat(" (TollFree)");
+                holder.display_place.setText(s4);
+                holder.us_east_displayplace=(TextView)view_us_east.findViewById(R.id.us_east_display_place);
+                holder.us_east_dialnumber_display=(TextView)view_us_east.findViewById(R.id.us_east_dialnumber_display);
+                holder.us_east_conferenceid=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid);
+                holder.us_east_conferenceid_display=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid_display);
+                holder.us_east_leadership=(TextView)view_us_east.findViewById(R.id.us_east_leadership);
+                holder.us_east_leadership_display=(TextView)view_us_east.findViewById(R.id.us_east_leadership_display);
+
+                holder.us_east_displayplace.setText("USA East Coast"+" (TollFree)");
+                holder.us_east_dialnumber_display.setText("+18446454399");
+                holder.us_east_conferenceid_display.setText(eventlist.getConference());
+
+                try {
+                    if (!eventlist.getLeadershipnumber().isEmpty()){
+                        holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
+                        holder.us_east_leadership.setText(";#");
+                    }if (eventlist.getLeadershipnumber().isEmpty()) {
+                        holder.us_east_leadership_display.setVisibility(View.GONE);
+                        holder.us_east_leadership.setVisibility(View.GONE);
+
+                    }
+                }catch (NullPointerException e){
+
+                }
+
+
+
+                holder.liner_layout.addView(view_us_east);
+
+            }
+            if(holder.dialnumber_display.getText().toString().equalsIgnoreCase("18002660610")){
+               String indtolle= holder.display_place.getText().toString();
+                String ss=indtolle.concat("( TollFree)");
+                holder.display_place.setText(ss);
             }
             holder.conferenceid_display.setText(eventlist.getConference());
                 try{
@@ -253,8 +295,6 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             }
             if ((size==1)&&(!eventlist.getConference().isEmpty())&&(number.equalsIgnoreCase("18002660610"))){
 
-
-
                 holder.us_east_displayplace=(TextView)view_us_east.findViewById(R.id.us_east_display_place);
                 holder.us_east_dialnumber_display=(TextView)view_us_east.findViewById(R.id.us_east_dialnumber_display);
                 holder.us_east_conferenceid=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid);
@@ -264,23 +304,23 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
                 holder.us_west_displayplace=(TextView)view_us_west.findViewById(R.id.us_west_display_place);
                 holder.us_west_dialnumber_display=(TextView)view_us_west.findViewById(R.id.us_west_dialnumber_display);
-                 holder.us_west_conferenceid=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid);
+                holder.us_west_conferenceid=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid);
                 holder.us_west_conferenceid_display=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid_display);
                 holder.us_west_leadership=(TextView)view_us_west.findViewById(R.id.us_west_leadership);
                 holder.us_west_leadership_display=(TextView)view_us_west.findViewById(R.id.us_west_leadership_display);
 
 
-                holder.us_east_displayplace.setText("USA East Coast");
+                holder.us_east_displayplace.setText("USA East Coast"+" (TollFree)");
                 holder.us_east_dialnumber_display.setText("+18446454399");
                 holder.us_east_conferenceid_display.setText(eventlist.getConference());
 
-                holder.us_west_displayplace.setText("USA West Coast");
+                holder.us_west_displayplace.setText("USA West Coast"+" (TollFree)");
                 holder.us_west_dialnumber_display.setText("+18446454398");
                 holder.us_west_conferenceid_display.setText(eventlist.getConference());
                 try {
                     if (!eventlist.getLeadershipnumber().isEmpty()){
-                        holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber());
-                        holder.us_west_leadership_display.setText(eventlist.getLeadershipnumber());
+                        holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
+                        holder.us_west_leadership_display.setText(eventlist.getLeadershipnumber().toString());
                         holder.us_west_leadership.setText(";#");
                         holder.us_east_leadership.setText(";#");
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
@@ -299,6 +339,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
 
             }
+
 
             holder.ib_call.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -322,7 +363,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                 public void onClick(View view) {
                     callPhoneNumber=((TextView) view_us_west.findViewById(R.id.us_west_dialnumber_display)).getText().toString();
                     callConferenceId= ((TextView) view_us_west.findViewById(R.id.us_west_conferenceid_display)).getText().toString();
-                    leadership=((TextView) view.findViewById(R.id.us_west_leadership_display)).getText().toString();
+                    leadership=((TextView) view_us_west.findViewById(R.id.us_west_leadership_display)).getText().toString();
                     Log.i("conferenceid",callConferenceId);
                     Log.i("callPhoneNumber",callPhoneNumber);
 //                    Log.d("leadership",leadership);
@@ -337,18 +378,23 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             holder.us_east_ib_call.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    callPhoneNumber=((TextView) view_us_east.findViewById(R.id.us_east_dialnumber_display)).getText().toString();
-                    callConferenceId= ((TextView) view_us_east.findViewById(R.id.us_east_conferenceid_display)).getText().toString();
-                    leadership=((TextView) view.findViewById(R.id.us_east_leadership_display)).getText().toString();
-                    Log.i("conferenceid",callConferenceId);
-                    Log.i("callPhoneNumber",callPhoneNumber);
-                    Log.d("leadership",leadership);
-                    if (leadership.isEmpty()) {
-                        dialNumberWithPermision(callPhoneNumber, callConferenceId);
-                        Log.d("empty","--");
-                    }else {
-                        dialNumberWithLeader(callPhoneNumber, callConferenceId,leadership);
-                    }
+                    callPhoneNumber = ((TextView) view_us_east.findViewById(R.id.us_east_dialnumber_display)).getText().toString();
+                    callConferenceId = ((TextView) view_us_east.findViewById(R.id.us_east_conferenceid_display)).getText().toString();
+
+                        leadership = ((TextView) view_us_east.findViewById(R.id.us_east_leadership_display)).getText().toString();
+
+
+                        Log.i("conferenceid", callConferenceId);
+                        Log.i("callPhoneNumber", callPhoneNumber);
+//                    Log.d("leadership",leadership);
+                        if (leadership.isEmpty()) {
+                            dialNumberWithPermision(callPhoneNumber, callConferenceId);
+                            Log.d("empty", "--");
+                        } else {
+                            dialNumberWithLeader(callPhoneNumber, callConferenceId, leadership);
+                        }
+
+
                 }
             });
 

@@ -31,7 +31,7 @@
 
                 <TextView
                     android:id="@+id/display_place"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/phone_location" />
@@ -39,7 +39,7 @@
                 <TextView
                     android:id="@+id/dialnumber_display"
                     android:layout_width="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:layout_height="wrap_content"
                     android:text=""
                     android:visibility="visible" />
@@ -57,7 +57,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=";"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:visibility="visible" />
 
                 <TextView
@@ -65,7 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:visibility="visible" />
 
             </LinearLayout>
@@ -81,14 +81,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/leadership_display"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:text=""
                     android:visibility="visible" />
 

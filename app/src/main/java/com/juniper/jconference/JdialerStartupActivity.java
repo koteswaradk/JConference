@@ -667,12 +667,11 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                        // model.setLeadershipnumber("2345123");
                         // String beforeQuestionMark = questionMarkTokens[0];
                         // beforeQuestionMark.replace("."," ");
-                        try
-                        {
+                        try {
                             String[] s_leadershi = instance_cursor.getString(2).split("Leadership");
                             String ss_leadershi=s_leadershi[1];
-                            String substring=ss_leadershi.substring(1,8);
-                            ss_leadershi.substring(1,7);
+                            String substring=ss_leadershi.substring(1,7);
+                            model.setLeadershipnumber(substring);
                         }catch (ArrayIndexOutOfBoundsException e){
 
                         }

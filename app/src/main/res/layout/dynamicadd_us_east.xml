@@ -32,13 +32,13 @@
                     android:id="@+id/us_east_display_place"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:text="@string/phone_location" />
 
                 <TextView
                     android:id="@+id/us_east_dialnumber_display"
                     android:visibility="visible"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="" />
@@ -54,7 +54,7 @@
                 <TextView
                     android:id="@+id/us_east_conferenceid"
                     android:visibility="visible"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=";" />
@@ -63,7 +63,7 @@
                     android:id="@+id/us_east_conferenceid_display"
                     android:layout_width="wrap_content"
                     android:visibility="visible"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:layout_height="wrap_content"
                     android:text="" />
 
@@ -80,14 +80,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/us_east_leadership_display"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:text=""
                     android:visibility="visible" />
 
