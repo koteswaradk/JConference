@@ -238,6 +238,10 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                     holder.display_place.setText("India Bangalore");
                     holder.dialnumber_display.setText("18002660610");
                 }
+                if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA East Coast")&&(eventlist.getNumberList().get(i).equalsIgnoreCase("+18446454399"))) {
+                    holder.display_place.setText("India Bangalore");
+                    holder.dialnumber_display.setText("18002660610");
+                }
             }catch (NullPointerException e){
 
             }
