@@ -1,6 +1,8 @@
 package com.juniper.jconference;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
@@ -18,7 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -55,7 +60,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     ListviewInsideListAdapter adapter;
     ArrayList<String> phonenumberList;
     private HorizontalCalendar horizontalCalendar;
-    InnerCallAdapter innsercallAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,34 +134,30 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
         });
 
-
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         try {
             Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
 
             if (!cursor.moveToFirst() || cursor.getCount() == 0){
-                Log.v(TAG,"cursor.getCount() == 0");
+                // Log.v(TAG,"cursor.getCount() == 0");
                 insertDataToDb(devicedate);
             }else
             {
-                Log.v(TAG,"cursor.getCount() == 0");
+                //  Log.v(TAG,"cursor.getCount() == 0");
                 updateDBFromCalender(devicedate);
 
             }
         }catch (SQLiteException eq){
 
         }
+        readEventsFromDB(devicedate);
     }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
-        readEventsFromDB(devicedate);
+       // horizontalCalendar.goToday(true);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -213,14 +214,14 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                 //   Log.d("service ","date_from_evet: "+date_from_evet);
                 if (!s_devicedate.equalsIgnoreCase(date_from_evet))
                 {
-                      Log.d("service ","date not equal");
+                     // Log.d("service ","date not equal");
                     dropTable();
                     insertDataToDb(s_devicedate);
 
                 }
                 if (s_devicedate.equalsIgnoreCase(date_from_evet))
                 {
-                    Log.d("service ","date equal");
+                   // Log.d("service ","date equal");
                     updateTodayMeeting(s_devicedate);
 
 
@@ -279,10 +280,10 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                             String titles = cursor.getString(1);
                             String details =cursor.getString(2);
                             String date_and_time_full= new Date((cursor.getLong(3))).toString();
-                            Log.i(TAG+"toady","insert date and time "+date_and_time_full);
+                           /* Log.i(TAG+"toady","insert date and time "+date_and_time_full);
                             Log.d(TAG+"today","insert titles"+titles);
                             Log.d(TAG+"today","insert details"+details);
-                            Log.d(TAG, "-------------------------------------");
+                            Log.d(TAG, "-------------------------------------");*/
                             ContentValues selectedValues = new ContentValues();
                             selectedValues.put(EventsDBHelper.KEY_CURRE_DATE_TIME, date_and_time_full);
                             selectedValues.put(EventsDBHelper.KEY_CURRE_EVENT, titles);
@@ -318,6 +319,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
         }
     }
+    //
     private void insertDataToDb(String device_date) {
         // Uri  uri=null;
         long now = System.currentTimeMillis();
@@ -434,9 +436,10 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         String eventdetails = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DETAILS));
 
                         model.setTitle(eventtitle);
-                        Log.i(TAG + "fromdb", "eventtitle: " + eventtitle);
+                       // Log.i(TAG + "fromdb", "eventdetails: " + eventdetails);
+                     /*   Log.i(TAG + "fromdb", "eventtitle: " + eventtitle);
                         Log.i(TAG, "fromdb: " + eventdateandtime);
-                        Log.i(TAG + "fromdb", "eventdetails: " + eventdetails);
+                        Log.i(TAG + "fromdb", "eventdetails: " + eventdetails);*/
                         //print values on log
 
                         // titleList.add(title);
@@ -449,8 +452,16 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                        try {
                            String[] s_leadershi = eventdetails.split("Leadership");
                            String ss_leadershi=s_leadershi[1];
-                           String substring=ss_leadershi.substring(1,7);
-                           model.setLeadershipnumber(substring);
+
+                           String substring=ss_leadershi.substring(1,15);
+
+                           String leadershipnumber=substring.replaceAll("[^0-9]", "");
+                           if (leadershipnumber.matches("[0-9]+") && leadershipnumber.length() > 2) {
+                               model.setLeadershipnumber(leadershipnumber);
+                           }if (leadershipnumber.isEmpty()) {
+                               model.setLeadershipnumber("Not Found");
+                           }
+
                        }catch (ArrayIndexOutOfBoundsException e){
 
                        }
@@ -458,10 +469,10 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         String[] questionJoin_by_Phone = eventdetails.split("Join by Phone");
                         String beforeQuestionMark = questionJoin_by_Phone[0];
                         if(beforeQuestionMark.contains("https://meet.juniper.net")){
-                            Log.d(TAG,"present");
+                          //  Log.d(TAG,"present");
                             model.setMeetJuniperPresent(true);
                         }else {
-                            Log.d(TAG,"not present");
+                           // Log.d(TAG,"not present");
                             model.setMeetJuniperPresent(false);
                         }
                         // beforeQuestionMark.replace("."," ");
@@ -653,7 +664,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         String title = instance_cursor.getString(1);
                         CallModel model = new CallModel();
                         model.setTitle(instance_cursor.getString(1));
-                        //  Log.i(TAG, "detailed: instance " + instance_cursor.getString(2));
+                          Log.i(TAG, "detailed: instance " + instance_cursor.getString(2));
                         //print values on log
                         // Log.i(TAG, "title: " + title);
                         // titleList.add(title);
@@ -670,8 +681,16 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         try {
                             String[] s_leadershi = instance_cursor.getString(2).split("Leadership");
                             String ss_leadershi=s_leadershi[1];
-                            String substring=ss_leadershi.substring(1,7);
-                            model.setLeadershipnumber(substring);
+
+                            String substring=ss_leadershi.substring(1,15);
+
+                             String leadershipnumber=substring.replaceAll("[^0-9]", "");
+                            if (leadershipnumber.matches("[0-9]+") && leadershipnumber.length() > 2) {
+                                model.setLeadershipnumber(leadershipnumber);
+                            }else{
+                                model.setLeadershipnumber("Not Set");
+                            }
+
                         }catch (ArrayIndexOutOfBoundsException e){
 
                         }
@@ -744,6 +763,16 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         }
     }
 
+   /* @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG,"onpause");
+        this.finish();
+        System.exit(0);
+    }*/
+
+
+
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -753,9 +782,40 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                 readEventsFromDB(devicedate);
                 break;
             case R.id.signout:
-                this.finish();
-                System.exit(0);
+                showDialog("Are You Sure Want To Exit JDialer...?");
+
                 break;
         }
+    }
+    public void showDialog(String msg){
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setContentView(R.layout.customdialog);
+        ImageView imageView=(ImageView) dialog.findViewById(R.id.a);
+        TextView text = (TextView) dialog.findViewById(R.id.text_dialog);
+        text.setText(msg);
+
+        Button dialogButton = (Button) dialog.findViewById(R.id.btn_dialog);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                finish();
+                System.exit(0);
+
+            }
+        });
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
     }
 }

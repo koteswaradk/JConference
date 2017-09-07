@@ -6,7 +6,7 @@
     <string name="recursive_meting_title">Recurrence Meetings</string>
     <string name="meeting_text">Meeting: </string>
     <string name="phone_location">location:</string>
-    <string name="confid">Conference ID:</string>
+   <!-- <string name="confid">Conference ID:</string>-->
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">fragment AllDays</string>

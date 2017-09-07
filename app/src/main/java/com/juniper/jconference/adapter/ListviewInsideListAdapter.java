@@ -107,6 +107,8 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             viewHolder.time_zone_display=(TextView)convertView.findViewById(R.id.time_zone_display);
             viewHolder.title_display=(TextView)convertView.findViewById(R.id.title_display);
             viewHolder.mainlayout=(LinearLayout)convertView.findViewById(R.id.main_layout);
+            viewHolder.leadership_pin_display=(TextView)convertView.findViewById(R.id.leadership_pin_display);
+            viewHolder.leadership_pin=(TextView)convertView.findViewById(R.id.leadership_pin);
             viewHolder.liner_layout=(LinearLayout) convertView.findViewById(R.id.add_list_layout);
 
 
@@ -121,27 +123,28 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         viewHolder.time_zone_display.setText(conferencecallmodel.getTimezone());
         viewHolder.date_display.setText(conferencecallmodel.getDate());
         viewHolder.title_display.setText(conferencecallmodel.getTitle());
+        try{
 
-       /* if (conferencecallmodel.isMeetJuniperPresent()){
-
-        }*/
-
-    /*   if (conferencecallmodel.isMeetJuniperPresent()){
-                for (int i = 0; i < conferencecallmodel.getNumberList().size(); i++) {
-            if((conferencecallmodel.getNumberList().get(i).startsWith("18")||conferencecallmodel.getNumberList().get(i).startsWith("+18"))&&conferencecallmodel.isMeetJuniperPresent())
             {
-                viewHolder.india_dsipaly.setText("Bangalore:18002660610‬"+";"+conferencecallmodel.getConference()+";"+"#");
-                viewHolder.us_west_dsipaly.setText("USA West:"+"+18446454398"+";"+conferencecallmodel.getConference()+";"+"#");
-                viewHolder.us_east_dsipaly.setText(("USA East:"+"+18446454399"+";"+conferencecallmodel.getConference()+";"+"#"));
-            }else{
-                viewHolder.india_dsipaly.setText(number_place_map.get(conferencecallmodel.getNumberList().get(i))+":"+conferencecallmodel.getNumberList().get(i)+";"+conferencecallmodel.getConference());
+                if (conferencecallmodel.getLeadershipnumber()==null){
+                   // viewHolder.leadership_pin_display.setText("Not Found");
+                    viewHolder.leadership_pin.setVisibility(View.GONE);
+                    viewHolder.leadership_pin_display.setVisibility(View.GONE);
+
+                }
+                if (conferencecallmodel.getLeadershipnumber()!=null) {
+                    viewHolder.leadership_pin.setVisibility(View.VISIBLE);
+                    viewHolder.leadership_pin_display.setVisibility(View.VISIBLE);
+                    viewHolder.leadership_pin_display.setText(conferencecallmodel.getLeadershipnumber());
+                }
+
             }
+
+        }catch (NullPointerException e){
+
         }
-       } else{
-           viewHolder.india_dsipaly.setVisibility(View.GONE);
-           viewHolder.us_west_dsipaly.setVisibility(View.GONE);
-           viewHolder.us_east_dsipaly.setVisibility(View.GONE);
-       }*/
+
+
 
         setItems(conferencecallmodel,position,viewHolder);
 
@@ -154,7 +157,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         });
 
 
-        notifyDataSetChanged();
+       // notifyDataSetChanged();
 
         return convertView;
     }
@@ -213,6 +216,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             String number=eventlist.getNumberList().get(i);
             holder.display_place.setText(number_place_map.get(eventlist.getNumberList().get(i)));
             holder.dialnumber_display.setText(eventlist.getNumberList().get(i));
+//            holder.leadership_display.setText(eventlist.getLeadershipnumber().toString());
             try {
 
                 if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA East Coast")) {
@@ -255,7 +259,8 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                 try {
                     if (!eventlist.getLeadershipnumber().isEmpty()){
                         holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
-                        holder.us_east_leadership.setText(";#");
+                        holder.us_east_leadership.setText("#;");
+
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
                         holder.us_east_leadership_display.setVisibility(View.GONE);
                         holder.us_east_leadership.setVisibility(View.GONE);
@@ -278,10 +283,10 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             holder.conferenceid_display.setText(eventlist.getConference());
                 try{
 
-                    if (!eventlist.getLeadershipnumber().isEmpty()){
+                    if (!eventlist.getLeadershipnumber().toString().isEmpty()){
                         holder.leadership_display.setText(eventlist.getLeadershipnumber().toString());
                         holder.leadership.setText("#;");
-                    }if (eventlist.getLeadershipnumber().isEmpty()){
+                    }if (eventlist.getLeadershipnumber().toString().isEmpty()){
                         holder.leadership_display.setVisibility(View.GONE);
                         holder.leadership.setVisibility(View.GONE);
                     }
@@ -298,6 +303,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                 holder.us_east_displayplace=(TextView)view_us_east.findViewById(R.id.us_east_display_place);
                 holder.us_east_dialnumber_display=(TextView)view_us_east.findViewById(R.id.us_east_dialnumber_display);
                 holder.us_east_conferenceid=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid);
+
                 holder.us_east_conferenceid_display=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid_display);
                 holder.us_east_leadership=(TextView)view_us_east.findViewById(R.id.us_east_leadership);
                 holder.us_east_leadership_display=(TextView)view_us_east.findViewById(R.id.us_east_leadership_display);
@@ -321,8 +327,8 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                     if (!eventlist.getLeadershipnumber().isEmpty()){
                         holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
                         holder.us_west_leadership_display.setText(eventlist.getLeadershipnumber().toString());
-                        holder.us_west_leadership.setText(";#");
-                        holder.us_east_leadership.setText(";#");
+                        holder.us_west_leadership.setText("#;");
+                        holder.us_east_leadership.setText("#;");
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
                         holder.us_east_leadership_display.setVisibility(View.GONE);
                         holder.us_east_leadership.setVisibility(View.GONE);
@@ -353,6 +359,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                     Log.d("leadership",leadership);
                     if (leadership.isEmpty()) {
                         dialNumberWithPermision(callPhoneNumber, callConferenceId);
+                        Log.d("empty","--");
                     }else {
                         dialNumberWithLeader(callPhoneNumber, callConferenceId,leadership);
                     }
@@ -366,7 +373,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                     leadership=((TextView) view_us_west.findViewById(R.id.us_west_leadership_display)).getText().toString();
                     Log.i("conferenceid",callConferenceId);
                     Log.i("callPhoneNumber",callPhoneNumber);
-//                    Log.d("leadership",leadership);
+                   Log.d("leadership",leadership);
                     if (leadership.isEmpty()) {
                         dialNumberWithPermision(callPhoneNumber, callConferenceId);
                         Log.d("empty","--");
@@ -386,7 +393,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
                         Log.i("conferenceid", callConferenceId);
                         Log.i("callPhoneNumber", callPhoneNumber);
-//                    Log.d("leadership",leadership);
+                        Log.d("leadership",leadership);
                         if (leadership.isEmpty()) {
                             dialNumberWithPermision(callPhoneNumber, callConferenceId);
                             Log.d("empty", "--");
@@ -504,13 +511,15 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             return;
         }
         Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:"+callPhoneNumber+";"+callConferenceId+"#"+";"+leadership));
+       // callIntent.setData(Uri.parse("tel:"+callPhoneNumber+";"+callConferenceId+"#"+","+"*"+";"+leadership+"#"));
+        callIntent.setData(Uri.parse("tel:"+callPhoneNumber+"%3B"+callConferenceId+"%23"+"%3B"+"%2A"+"%2C"+leadership+"%23"));
+       // callIntent.setData(Uri.parse("tel:"+callPhoneNumber+"%3B"+callConferenceId+"%23"+"%2C"+"%2A"+"%2C"+leadership+"%23"));
         //callIntent.setData(Uri.parse("tel:"+pnmu+","+conf+"#"));
         context.startActivity(callIntent);
     }
 
 
-    public void dialNumberWithPermision(String pnmu, String conf){
+    public void dialNumberWithPermision(String pnmu, String callConferenceId){
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
 
@@ -527,9 +536,13 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        Log.v(TAG+"0,1",pnmu.substring(0,2));
+       // Log.v(TAG+"0,1",pnmu.substring(0,2));
 
-        if(pnmu.substring(0,2).equalsIgnoreCase("+1")){
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        //callIntent.setData(Uri.parse("tel:"+pnmu+",,,,"+conf+"#"));
+        callIntent.setData(Uri.parse("tel:"+pnmu+";"+callConferenceId+"#"));
+        context.startActivity(callIntent);
+       /* if(pnmu.substring(0,2).equalsIgnoreCase("+1")){
 
             Intent callIntent = new Intent(Intent.ACTION_CALL);
              callIntent.setData(Uri.parse("tel:"+pnmu+";"+conf+"#"));
@@ -543,12 +556,9 @@ public class ListviewInsideListAdapter extends BaseAdapter{
            // callIntent.setData(Uri.parse("tel:"+pnmu+",,,,,"+conf+"#"));
             context.startActivity(callIntent);
 
-        }else{
-            Intent callIntent = new Intent(Intent.ACTION_CALL);
-            //callIntent.setData(Uri.parse("tel:"+pnmu+",,,,"+conf+"#"));
-            callIntent.setData(Uri.parse("tel:"+pnmu+";"+conf+"#"));
-            context.startActivity(callIntent);
-        }
+        }else{*/
+
+        //}
 
 
     }
@@ -565,7 +575,8 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         TextView leadership;
         ImageButton ib_call;
         LinearLayout mainlayout;
-
+        TextView leadership_pin_display;
+        TextView leadership_pin;
         TextView leasdership;
         TextView display_place;
         TextView leadership_display;
