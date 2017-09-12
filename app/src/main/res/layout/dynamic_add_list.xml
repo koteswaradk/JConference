@@ -127,10 +127,50 @@
                 </LinearLayout>
 
             </LinearLayout>
+        <LinearLayout
+            android:id="@+id/add_list_layout1"
+            android:layout_width="match_parent"
+            android:visibility="visible"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+        </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="center"
+                android:background="#D3D3D3" />
+            <LinearLayout
+                android:id="@+id/list_layout_hide"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:visibility="gone"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <ToggleButton
+                    android:textOff="@null"
+                    android:textOn="@null"
+                    android:textSize="0dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:id="@+id/hide_show_other"
+                    android:background="@drawable/add"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp" />
+                <TextView
+                    android:layout_marginLeft="10dp"
+                    android:id="@+id/other_number"
+                    android:layout_gravity="center"
+                    android:layout_width="match_parent"
+                    android:text="Other Number"
+                    android:layout_height="wrap_content" />
 
+
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/add_list_layout"
                 android:layout_width="match_parent"
+                android:visibility="gone"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 

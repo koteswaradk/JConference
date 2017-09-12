@@ -58,6 +58,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     ImageButton refreah_button,signout;
     TextView t_date, nomeetings;
     ListviewInsideListAdapter adapter;
+    InnerCallAdapter innsercallAdapter;
     ArrayList<String> phonenumberList;
     private HorizontalCalendar horizontalCalendar;
 
@@ -459,7 +460,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                            if (leadershipnumber.matches("[0-9]+") && leadershipnumber.length() > 2) {
                                model.setLeadershipnumber(leadershipnumber);
                            }if (leadershipnumber.isEmpty()) {
-                               model.setLeadershipnumber("Not Found");
+                              // model.setLeadershipnumber("Not Found");
                            }
 
                        }catch (ArrayIndexOutOfBoundsException e){
@@ -520,14 +521,14 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                     //  Log.d(TAG, "not empty-");
                     listView.setVisibility(View.VISIBLE);
                     nomeetings.setVisibility(View.GONE);
-                   // innsercallAdapter =new InnerCallAdapter(this,conference_call_model);
-                    adapter = new ListviewInsideListAdapter(this,conference_call_model);
+                    innsercallAdapter =new InnerCallAdapter(this,conference_call_model);
+                   // adapter = new ListviewInsideListAdapter(this,conference_call_model);
                     // timezoneadapter=new TimeZoneCallAdapter(this,conference_call_model);
-                    listView.setAdapter(adapter);
-                   //  listView.setAdapter(innsercallAdapter);
-//                    innsercallAdapter.notifyDataSetChanged();
-                    adapter.notifyDataSetChanged();
-                    // timezoneadapter.notifyDataSetChanged();
+                   // listView.setAdapter(adapter);
+                    listView.setAdapter(innsercallAdapter);
+                    innsercallAdapter.notifyDataSetChanged();
+                   // adapter.notifyDataSetChanged();
+                     innsercallAdapter.notifyDataSetChanged();
                 }
                 if (conference_call_model.isEmpty()) {
                     //  Log.d(TAG, " empty-");
@@ -664,7 +665,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         String title = instance_cursor.getString(1);
                         CallModel model = new CallModel();
                         model.setTitle(instance_cursor.getString(1));
-                          Log.i(TAG, "detailed: instance " + instance_cursor.getString(2));
+                        //  Log.i(TAG, "detailed: instance " + instance_cursor.getString(2));
                         //print values on log
                         // Log.i(TAG, "title: " + title);
                         // titleList.add(title);
@@ -688,7 +689,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                             if (leadershipnumber.matches("[0-9]+") && leadershipnumber.length() > 2) {
                                 model.setLeadershipnumber(leadershipnumber);
                             }else{
-                                model.setLeadershipnumber("Not Set");
+                               // model.setLeadershipnumber("Not Set");
                             }
 
                         }catch (ArrayIndexOutOfBoundsException e){
@@ -734,12 +735,12 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                     //  Log.d(TAG, "not empty-");
                     listView.setVisibility(View.VISIBLE);
                     nomeetings.setVisibility(View.GONE);
-                   // innsercallAdapter =new InnerCallAdapter(this,conference_call_model);
-                    adapter = new ListviewInsideListAdapter(this, conference_call_model);
-                    listView.setAdapter(adapter);
-                    //listView.setAdapter(innsercallAdapter);
-                    adapter.notifyDataSetChanged();
-                   // innsercallAdapter.notifyDataSetChanged();
+                    innsercallAdapter =new InnerCallAdapter(this,conference_call_model);
+                   // adapter = new ListviewInsideListAdapter(this, conference_call_model);
+                   // listView.setAdapter(adapter);
+                    listView.setAdapter(innsercallAdapter);
+                   // adapter.notifyDataSetChanged();
+                    innsercallAdapter.notifyDataSetChanged();
                 }
                 if (conference_call_model.isEmpty()) {
                     //  Log.d(TAG, " empty-");
@@ -794,12 +795,13 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setContentView(R.layout.customdialog);
-        ImageView imageView=(ImageView) dialog.findViewById(R.id.a);
+      /*  ImageView imageViewyes=(ImageView) dialog.findViewById(R.id.a);
         TextView text = (TextView) dialog.findViewById(R.id.text_dialog);
-        text.setText(msg);
+        text.setText(msg);*/
 
-        Button dialogButton = (Button) dialog.findViewById(R.id.btn_dialog);
-        dialogButton.setOnClickListener(new View.OnClickListener() {
+        Button button_cancel = (Button) dialog.findViewById(R.id.btn_cancel);
+        Button button_yes = (Button) dialog.findViewById(R.id.btn_yes);
+        button_yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
@@ -809,7 +811,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
             }
         });
 
-        imageView.setOnClickListener(new View.OnClickListener() {
+        button_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();

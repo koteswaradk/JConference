@@ -74,6 +74,10 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         number_place_map.put("+14089369000","USA West Coast");
         number_place_map.put("+18446454398","USA West Coast");
         number_place_map.put("+18002660323","USA West Coast");
+        number_place_map.put("+1 844 645 4399","USA West Coast");
+        number_place_map.put("+1 408 936 9000","USA West Coast");
+        number_place_map.put("1800 266 0610","India Bangalore");
+        number_place_map.put("+1 978 589 8300","USA East Coast");
 
 
         Collections.sort(this.eventlist, new ListviewInsideListAdapter.TimeComparator());
@@ -148,7 +152,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
         setItems(conferencecallmodel,position,viewHolder);
 
-        viewHolder.mainlayout.setOnClickListener(new View.OnClickListener() {
+        viewHolder.title_display.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
               // Log.d(TAG+"uuuuuuu",conferencecallmodel.getDetails());
@@ -203,6 +207,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             final View view = inflater.inflate(R.layout.dynamicadd_row, null);
             final View view_us_east = inflater.inflate(R.layout.dynamicadd_us_east, null);
             final View view_us_west = inflater.inflate(R.layout.dynamicadd_us_west, null);
+            final View view_india = inflater.inflate(R.layout.dynamicadd_india, null);
             holder.display_place=(TextView)view.findViewById(R.id.display_place);
             holder.dialnumber_display = (TextView) view.findViewById(R.id.dialnumber_display);
             holder.conferenceid=(TextView)view.findViewById(R.id.conferenceid);
@@ -214,7 +219,21 @@ public class ListviewInsideListAdapter extends BaseAdapter{
             holder.us_east_ib_call=(ImageButton)view_us_east.findViewById(R.id.east_ib_call);
 
             String number=eventlist.getNumberList().get(i);
+
             holder.display_place.setText(number_place_map.get(eventlist.getNumberList().get(i)));
+            try{
+                if( number_place_map.get(eventlist.getNumberList().get(i)).toString().equalsIgnoreCase("India Bangalor")){
+                    holder.display_place.setText(number_place_map.get(eventlist.getNumberList().get(i)));
+                    String s1=holder.display_place.getText().toString();
+                    String s2=s1.concat(" (TollFree)");
+                    holder.display_place.setText(s2);
+                }else{
+                    holder.display_place.setText(number_place_map.get(eventlist.getNumberList().get(i)));
+                }
+            }catch (NullPointerException e){
+
+            }
+
             holder.dialnumber_display.setText(eventlist.getNumberList().get(i));
 //            holder.leadership_display.setText(eventlist.getLeadershipnumber().toString());
             try {
@@ -234,14 +253,19 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                 if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("India Bangalore")) {
                     holder.dialnumber_display.setText("18002660610");
                 }
+
                 if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA West Coast")&&(eventlist.getNumberList().get(i).equalsIgnoreCase("+18446454398"))) {
                     holder.display_place.setText("India Bangalore");
                     holder.dialnumber_display.setText("18002660610");
                 }
+
                 if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA East Coast")&&(eventlist.getNumberList().get(i).equalsIgnoreCase("+18446454399"))) {
                     holder.display_place.setText("India Bangalore");
+
                     holder.dialnumber_display.setText("18002660610");
+
                 }
+
             }catch (NullPointerException e){
 
             }
@@ -280,7 +304,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
 
 
-                holder.liner_layout.addView(view_us_east);
+               // holder.liner_layout.addView(view_us_east);
 
             }
             if(holder.dialnumber_display.getText().toString().equalsIgnoreCase("18002660610")){
@@ -293,6 +317,7 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
                     if (!eventlist.getLeadershipnumber().toString().isEmpty()){
                         holder.leadership_display.setText(eventlist.getLeadershipnumber().toString());
+                        holder.ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
                         holder.leadership.setText("#;");
                     }if (eventlist.getLeadershipnumber().toString().isEmpty()){
                         holder.leadership_display.setVisibility(View.GONE);
@@ -302,8 +327,65 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                 }catch (NullPointerException e){
 
                 }
-            if (!eventlist.getConference().isEmpty()){
-                holder.liner_layout.addView(view);
+
+            if ((size==1)&&(!eventlist.getConference().isEmpty())&&(number.equalsIgnoreCase("18002660323"))){
+
+                holder.us_east_displayplace=(TextView)view_us_east.findViewById(R.id.us_east_display_place);
+                holder.us_east_dialnumber_display=(TextView)view_us_east.findViewById(R.id.us_east_dialnumber_display);
+                holder.us_east_conferenceid=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid);
+
+                holder.us_east_conferenceid_display=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid_display);
+                holder.us_east_leadership=(TextView)view_us_east.findViewById(R.id.us_east_leadership);
+                holder.us_east_leadership_display=(TextView)view_us_east.findViewById(R.id.us_east_leadership_display);
+
+                holder.us_west_displayplace=(TextView)view_us_west.findViewById(R.id.us_west_display_place);
+                holder.us_west_dialnumber_display=(TextView)view_us_west.findViewById(R.id.us_west_dialnumber_display);
+                holder.us_west_conferenceid=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid);
+                holder.us_west_conferenceid_display=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid_display);
+                holder.us_west_leadership=(TextView)view_us_west.findViewById(R.id.us_west_leadership);
+                holder.us_west_leadership_display=(TextView)view_us_west.findViewById(R.id.us_west_leadership_display);
+
+             /*   holder.india_displayplace=(TextView)view_india.findViewById(R.id.us_west_display_place);
+                holder.india_dialnumber_display=(TextView)view_india.findViewById(R.id.us_west_dialnumber_display);
+                holder.india_conferenceid=(TextView)view_india.findViewById(R.id.us_west_conferenceid);
+                holder.india_conferenceid_display=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid_display);
+                holder.india_leadership=(TextView)view_us_west.findViewById(R.id.us_west_leadership);
+                holder.india_leadership_display=(TextView)view_us_west.findViewById(R.id.us_west_leadership_display);*/
+
+                holder.display_place.setText("India Bangalore");
+                holder.dialnumber_display.setText("18002660610");
+                holder.dialnumber_display.setText("+18446454399");
+                String s1=holder.display_place.getText().toString();
+                String s2=s1.concat(" (TollFree)");
+                holder.display_place.setText(s2);
+
+                holder.us_east_displayplace.setText("USA East Coast"+" (TollFree)");
+                holder.us_east_dialnumber_display.setText("+18446454399");
+                holder.us_east_conferenceid_display.setText(eventlist.getConference());
+
+                holder.us_west_displayplace.setText("USA West Coast"+" (TollFree)");
+                holder.us_west_dialnumber_display.setText("+18446454398");
+                holder.us_west_conferenceid_display.setText(eventlist.getConference());
+                try {
+                    if (!eventlist.getLeadershipnumber().isEmpty()){
+                        holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
+                        holder.us_west_leadership_display.setText(eventlist.getLeadershipnumber().toString());
+                        holder.us_west_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
+                        holder.us_east_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
+                        holder.us_west_leadership.setText("#;");
+                        holder.us_east_leadership.setText("#;");
+                    }if (eventlist.getLeadershipnumber().isEmpty()) {
+                        holder.us_east_leadership_display.setVisibility(View.GONE);
+                        holder.us_east_leadership.setVisibility(View.GONE);
+                        holder.us_west_leadership_display.setVisibility(View.GONE);
+                        holder.us_west_leadership.setVisibility(View.GONE);
+                    }
+                }catch (NullPointerException e){
+
+                }
+
+                holder.liner_layout.addView(view_us_west);
+                holder.liner_layout.addView(view_us_east);
 
             }
             if ((size==1)&&(!eventlist.getConference().isEmpty())&&(number.equalsIgnoreCase("18002660610"))){
@@ -323,6 +405,14 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                 holder.us_west_leadership=(TextView)view_us_west.findViewById(R.id.us_west_leadership);
                 holder.us_west_leadership_display=(TextView)view_us_west.findViewById(R.id.us_west_leadership_display);
 
+             /*   holder.india_displayplace=(TextView)view_india.findViewById(R.id.us_west_display_place);
+                holder.india_dialnumber_display=(TextView)view_india.findViewById(R.id.us_west_dialnumber_display);
+                holder.india_conferenceid=(TextView)view_india.findViewById(R.id.us_west_conferenceid);
+                holder.india_conferenceid_display=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid_display);
+                holder.india_leadership=(TextView)view_us_west.findViewById(R.id.us_west_leadership);
+                holder.india_leadership_display=(TextView)view_us_west.findViewById(R.id.us_west_leadership_display);*/
+
+
 
                 holder.us_east_displayplace.setText("USA East Coast"+" (TollFree)");
                 holder.us_east_dialnumber_display.setText("+18446454399");
@@ -335,6 +425,8 @@ public class ListviewInsideListAdapter extends BaseAdapter{
                     if (!eventlist.getLeadershipnumber().isEmpty()){
                         holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
                         holder.us_west_leadership_display.setText(eventlist.getLeadershipnumber().toString());
+                        holder.us_west_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
+                        holder.us_east_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
                         holder.us_west_leadership.setText("#;");
                         holder.us_east_leadership.setText("#;");
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
@@ -347,13 +439,76 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
                 }
 
+                holder.liner_layout.addView(view_us_west);
+                holder.liner_layout.addView(view_us_east);
+
+
+
+            }
+            if ((size==2)&&(!eventlist.getConference().isEmpty())&&(number.equalsIgnoreCase("18002660610"))){
+
+                holder.us_east_displayplace=(TextView)view_us_east.findViewById(R.id.us_east_display_place);
+                holder.us_east_dialnumber_display=(TextView)view_us_east.findViewById(R.id.us_east_dialnumber_display);
+                holder.us_east_conferenceid=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid);
+
+                holder.us_east_conferenceid_display=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid_display);
+                holder.us_east_leadership=(TextView)view_us_east.findViewById(R.id.us_east_leadership);
+                holder.us_east_leadership_display=(TextView)view_us_east.findViewById(R.id.us_east_leadership_display);
+
+                holder.us_west_displayplace=(TextView)view_us_west.findViewById(R.id.us_west_display_place);
+                holder.us_west_dialnumber_display=(TextView)view_us_west.findViewById(R.id.us_west_dialnumber_display);
+                holder.us_west_conferenceid=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid);
+                holder.us_west_conferenceid_display=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid_display);
+                holder.us_west_leadership=(TextView)view_us_west.findViewById(R.id.us_west_leadership);
+                holder.us_west_leadership_display=(TextView)view_us_west.findViewById(R.id.us_west_leadership_display);
+
+             /*   holder.india_displayplace=(TextView)view_india.findViewById(R.id.us_west_display_place);
+                holder.india_dialnumber_display=(TextView)view_india.findViewById(R.id.us_west_dialnumber_display);
+                holder.india_conferenceid=(TextView)view_india.findViewById(R.id.us_west_conferenceid);
+                holder.india_conferenceid_display=(TextView)view_us_west.findViewById(R.id.us_west_conferenceid_display);
+                holder.india_leadership=(TextView)view_us_west.findViewById(R.id.us_west_leadership);
+                holder.india_leadership_display=(TextView)view_us_west.findViewById(R.id.us_west_leadership_display);*/
+
+
+
+                holder.us_east_displayplace.setText("USA East Coast"+" (TollFree)");
+                holder.us_east_dialnumber_display.setText("+18446454399");
+                holder.us_east_conferenceid_display.setText(eventlist.getConference());
+
+                holder.us_west_displayplace.setText("USA West Coast"+" (TollFree)");
+                holder.us_west_dialnumber_display.setText("+18446454398");
+                holder.us_west_conferenceid_display.setText(eventlist.getConference());
+                try {
+                    if (!eventlist.getLeadershipnumber().isEmpty()){
+                        holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
+                        holder.us_west_leadership_display.setText(eventlist.getLeadershipnumber().toString());
+                        holder.us_west_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
+                        holder.us_east_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
+                        holder.us_west_leadership.setText("#;");
+                        holder.us_east_leadership.setText("#;");
+                    }if (eventlist.getLeadershipnumber().isEmpty()) {
+                        holder.us_east_leadership_display.setVisibility(View.GONE);
+                        holder.us_east_leadership.setVisibility(View.GONE);
+                        holder.us_west_leadership_display.setVisibility(View.GONE);
+                        holder.us_west_leadership.setVisibility(View.GONE);
+                    }
+                }catch (NullPointerException e){
+
+                }
 
                 holder.liner_layout.addView(view_us_west);
                 holder.liner_layout.addView(view_us_east);
 
 
+
             }
 
+
+            if (!eventlist.getConference().isEmpty()){
+
+                holder.liner_layout.addView(view);
+
+            }
 
             holder.ib_call.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -412,90 +567,6 @@ public class ListviewInsideListAdapter extends BaseAdapter{
 
                 }
             });
-
-         /*   holder.leasdership =  (TextView) view.findViewById(R.id.leasdership);
-            holder.location_display=(TextView)view.findViewById(R.id.dialnumber);*/
-
-           /* final View view_us_west = inflater.inflate(R.layout.dynamicadd_us_west, null);
-            final View view_us_east = inflater.inflate(R.layout.dynamicadd_us_east, null);
-
-            holder.us_west_dialnumber=(TextView) view_us_west.findViewById(R.id.us_west_dialnumber);
-            holder.us_west_conferenceid=(TextView) view_us_west.findViewById(R.id.us_west_conferenceid);
-            holder.us_west_dialnumber_display=(TextView)view_us_west.findViewById(R.id.us_west_dialnumber_display);
-            holder.west_ib_call=(ImageButton)view_us_west.findViewById(R.id.west_ib_call);
-            holder.us_west_leasdership_=(TextView)view_us_west.findViewById(R.id.us_west_leadership);
-           // Log.d(TAG+"number",eventlist.getNumberList().get(i));
-
-            holder.us_east_dialnumber=(TextView) view_us_east.findViewById(R.id.us_east_dialnumber);
-            holder.us_east_conferenceid=(TextView) view_us_east.findViewById(R.id.us_east_conferenceid);
-            holder.us_east_dialnumber_display=(TextView)view_us_east.findViewById(R.id.us_east_dialnumber_display);
-            holder.east_ib_call=(ImageButton)view_us_east.findViewById(R.id.east_ib_call);
-            holder.us_east_leasdership_=(TextView)view_us_east.findViewById(R.id.us_east_leadership);
-
-
-            String number=eventlist.getNumberList().get(i);
-            if (number.startsWith("18"))
-            {
-
-            }
-
-            holder.conferenceid_display.setText(eventlist.getConference());
-
-            callConferenceId=eventlist.getConference();
-            leadership=eventlist.getLeadershipnumber();
-            if (number.startsWith("18")) {
-                holder.location_display.setText(number_place_map.get(eventlist.getNumberList().get(i)) + " " + eventlist.getNumberList().get(i) + " (TollFree)");
-
-            }
-
-            if (eventlist.isMeetJuniperPresent()){
-
-                holder.us_east_dialnumber.setText(number_place_map.get("+18446454399")+" +18446454399"+" (TollFree)");
-                holder.us_west_dialnumber.setText(number_place_map.get("+18446454398")+"+18446454398"+"(TollFree)");
-
-                holder.us_west_conferenceid.setText(eventlist.getConference());
-                holder.us_east_conferenceid.setText(eventlist.getConference());
-              //  Log.d(TAG+"leader",eventlist.getLeadershipnumber());
-
-                holder.us_west_leasdership_.setText(eventlist.getLeadershipnumber().toString());
-                holder.us_east_leasdership_.setText(eventlist.getLeadershipnumber().toString());
-
-                holder.us_west_dialnumber_display.setText("+18446454398");
-                holder.us_east_dialnumber_display.setText("+18446454399");
-
-
-            }
-            if ((holder.dialnumber_display.getText().toString().equalsIgnoreCase("18002660323"))){
-                holder.dialnumber_display.setText("18002660610");
-                holder.location_display.setText(number_place_map.get(holder.dialnumber_display.getText().toString())  + "18002660610" + " (TollFree)");
-               // Log.v("fff",holder.dialnumber_display.getText().toString()+""+ holder.location_display.getText().toString());
-                // holder.dialnumber_display.setText(18002660610)
-            }
-            if ((holder.dialnumber_display.getText().toString().equalsIgnoreCase("1800610422"))){
-                holder.dialnumber_display.setText("18002660610");
-                holder.location_display.setText(number_place_map.get(holder.dialnumber_display.getText().toString())  + "18002660610" + " (TollFree)");
-               // Log.v("fff",holder.dialnumber_display.getText().toString()+""+ holder.location_display.getText().toString());
-                // holder.dialnumber_display.setText(18002660610)
-            }*/
-           /* if ((!eventlist.getConference().isEmpty())){
-                holder.liner_layout.addView(view);
-            }*/
-         /*   if ((!eventlist.getConference().isEmpty())&&((number.startsWith("18")||number.startsWith("+18")))){
-
-                holder.liner_layout.addView(view_us_west);
-                holder.liner_layout.addView(view_us_east);
-
-            }
-
-            if (eventlist.getNumberList().get(i).toString().equalsIgnoreCase("+19785898300")||eventlist.getNumberList().get(i).toString().equalsIgnoreCase("+14089369000")){
-                holder.liner_layout.removeView(view);
-            }
-            if ((eventlist.getNumberList().get(i).toString().startsWith("18"))&&(eventlist.getNumberList().get(i).toString().equalsIgnoreCase("+18446454398")||eventlist.getNumberList().get(i).toString().equalsIgnoreCase("+18446454399")||eventlist.getNumberList().get(i).toString().equalsIgnoreCase("+18002660610"))){
-                holder.liner_layout.removeView(view);
-            }*/
-
-
-
 
         }
 
@@ -603,6 +674,15 @@ public class ListviewInsideListAdapter extends BaseAdapter{
         TextView us_east_conferenceid_display;
         TextView us_east_leadership;
         TextView us_east_leadership_display;
+
+
+        TextView india_displayplace;
+        TextView india_conferenceid;
+        TextView india_dialnumber_display;
+        ImageButton india_ib_call;
+        TextView india_conferenceid_display;
+        TextView india_leadership;
+        TextView india_leadership_display;
 
 
 

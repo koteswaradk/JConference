@@ -31,6 +31,7 @@
         android:id="@+id/a"
         android:layout_below="@+id/alertdialog_layout"
         android:gravity="center"
+        android:visibility="gone"
         android:background="@color/colorPrimaryDark"
         android:src="@drawable/error"
         android:scaleType="fitCenter" />
@@ -38,7 +39,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
+        android:text="Do You Want To Close the JDialer...?"
         android:id="@+id/text_dialog"
         android:layout_marginTop="17dp"
         android:layout_marginLeft="4dp"
@@ -52,14 +53,27 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:text="Yes"
+        android:text="Cancel"
         android:layout_marginTop="10dp"
-        android:id="@+id/btn_dialog"
-        android:gravity="center_vertical|center_horizontal"
+        android:id="@+id/btn_cancel"
+        android:layout_marginLeft="30dp"
         android:layout_below="@+id/text_dialog"
         android:layout_marginBottom="20dp"
         android:background="@drawable/btn_flat_red_selector"
-        android:layout_centerHorizontal="true"
+
         android:textColor="#ffffffff" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:text="Yes"
+        android:layout_marginTop="10dp"
+        android:id="@+id/btn_yes"
+       android:layout_marginLeft="50dp"
+        android:layout_toRightOf="@+id/btn_cancel"
+        android:layout_below="@+id/text_dialog"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/btn_flat_red_selector"
+        android:textColor="#ffffffff" />
+
 
 </RelativeLayout>
