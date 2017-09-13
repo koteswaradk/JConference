@@ -162,7 +162,7 @@
                     android:id="@+id/other_number"
                     android:layout_gravity="center"
                     android:layout_width="match_parent"
-                    android:text="Other Number"
+                    android:text="Other Dialine Numbers"
                     android:layout_height="wrap_content" />
 
 
