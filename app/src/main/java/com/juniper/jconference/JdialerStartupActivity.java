@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.google.i18n.phonenumbers.PhoneNumberMatch;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.juniper.jconference.adapter.InnerCallAdapter;
+import com.juniper.jconference.adapter.JDialerBaseAdapter;
 import com.juniper.jconference.adapter.ListviewInsideListAdapter;
 import com.juniper.jconference.db.EventsDBHelper;
 import com.juniper.jconference.model.CallModel;
@@ -60,6 +61,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     ListviewInsideListAdapter adapter;
     InnerCallAdapter innsercallAdapter;
     ArrayList<String> phonenumberList;
+    JDialerBaseAdapter jdialerdapter;
     private HorizontalCalendar horizontalCalendar;
 
     @Override
@@ -67,7 +69,6 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jdialer_startup);
         init();
-
 
     }
 
@@ -134,7 +135,25 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
             }
 
         });
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                horizontalCalendar.goToday(true);
+                updateDBFromCalender(devicedate);
+                loadMeetingFromDB(devicedate);
 
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+       // horizontalCalendar.goToday(true);
         try {
             Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
 
@@ -151,24 +170,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
         }
         readEventsFromDB(devicedate);
-    }
 
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-       // horizontalCalendar.goToday(true);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                horizontalCalendar.goToday(true);
-                updateDBFromCalender(devicedate);
-                loadMeetingFromDB(devicedate);
-
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        });
 
 
 
@@ -521,14 +523,17 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                     //  Log.d(TAG, "not empty-");
                     listView.setVisibility(View.VISIBLE);
                     nomeetings.setVisibility(View.GONE);
+                    //jdialerdapter=new JDialerBaseAdapter(this,conference_call_model);
                     innsercallAdapter =new InnerCallAdapter(this,conference_call_model);
                    // adapter = new ListviewInsideListAdapter(this,conference_call_model);
                     // timezoneadapter=new TimeZoneCallAdapter(this,conference_call_model);
                    // listView.setAdapter(adapter);
+                   // listView.setAdapter(jdialerdapter);
                     listView.setAdapter(innsercallAdapter);
-                    innsercallAdapter.notifyDataSetChanged();
+                   // jdialerdapter.notifyDataSetChanged();
                    // adapter.notifyDataSetChanged();
-                     innsercallAdapter.notifyDataSetChanged();
+                    innsercallAdapter.notifyDataSetChanged();
+
                 }
                 if (conference_call_model.isEmpty()) {
                     //  Log.d(TAG, " empty-");
@@ -735,12 +740,15 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                     //  Log.d(TAG, "not empty-");
                     listView.setVisibility(View.VISIBLE);
                     nomeetings.setVisibility(View.GONE);
+                   // jdialerdapter=new JDialerBaseAdapter(this,conference_call_model);
                     innsercallAdapter =new InnerCallAdapter(this,conference_call_model);
                    // adapter = new ListviewInsideListAdapter(this, conference_call_model);
                    // listView.setAdapter(adapter);
+                    //listView.setAdapter(jdialerdapter);
                     listView.setAdapter(innsercallAdapter);
                    // adapter.notifyDataSetChanged();
                     innsercallAdapter.notifyDataSetChanged();
+                   //jdialerdapter.notifyDataSetChanged();
                 }
                 if (conference_call_model.isEmpty()) {
                     //  Log.d(TAG, " empty-");

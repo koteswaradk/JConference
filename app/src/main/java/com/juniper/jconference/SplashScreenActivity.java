@@ -58,9 +58,10 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
 
+
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         Date today = Calendar.getInstance().getTime();
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
@@ -76,11 +77,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         }catch (SQLiteException eq){
 
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         readData();
     }
 
