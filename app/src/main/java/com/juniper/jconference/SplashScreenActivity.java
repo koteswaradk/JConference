@@ -178,10 +178,10 @@ public class SplashScreenActivity extends AppCompatActivity {
                             String titles = cursor.getString(1);
                             String details =cursor.getString(2);
                             String date_and_time_full= new Date((cursor.getLong(3))).toString();
-                            Log.i(TAG+"toady","insert date and time "+date_and_time_full);
+                           /* Log.i(TAG+"toady","insert date and time "+date_and_time_full);
                             Log.d(TAG+"today","insert titles"+titles);
                             Log.d(TAG+"today","insert details"+details);
-                            Log.d(TAG, "-------------------------------------");
+                            Log.d(TAG, "-------------------------------------");*/
                             ContentValues selectedValues = new ContentValues();
                             selectedValues.put(EventsDBHelper.KEY_CURRE_DATE_TIME, date_and_time_full);
                             selectedValues.put(EventsDBHelper.KEY_CURRE_EVENT, titles);

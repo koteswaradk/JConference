@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -16,26 +17,39 @@ import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.i18n.phonenumbers.PhoneNumberMatch;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.juniper.jconference.adapter.InnerCallAdapter;
 import com.juniper.jconference.adapter.JDialerBaseAdapter;
 import com.juniper.jconference.adapter.ListviewInsideListAdapter;
+import com.juniper.jconference.adapter.SpinnerAdapter;
 import com.juniper.jconference.db.EventsDBHelper;
 import com.juniper.jconference.model.CallModel;
+import com.juniper.jconference.model.ItemData;
 import com.juniper.jconference.provider.Provider;
+import com.juniper.jconference.util.NoDefaultSpinner;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,6 +59,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TimeZone;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.HorizontalCalendarListener;
@@ -63,12 +78,15 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     ArrayList<String> phonenumberList;
     JDialerBaseAdapter jdialerdapter;
     private HorizontalCalendar horizontalCalendar;
-
+    NoDefaultSpinner spinner;  boolean isSpinnerInitial = false;
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jdialer_startup);
+
         init();
+
 
     }
 
@@ -77,20 +95,32 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         listView = (ListView) findViewById(R.id.list);
         refreah_button = (ImageButton) findViewById(R.id.refresh);
         t_date = (TextView) findViewById(R.id.tool_date_display);
-        signout=(ImageButton)findViewById(R.id.signout);
+       // signout=(ImageButton)findViewById(R.id.signout);
+        ArrayList<ItemData> list=new ArrayList<>();
+
+        list.add(new ItemData("Reset",R.drawable.settings));
+        list.add(new ItemData("Exit",R.drawable.signoutc));
+        list.add(new ItemData("About App",R.drawable.infosign));
+
+        spinner=(NoDefaultSpinner)findViewById(R.id.spinner);
+
+
+       /* SpinnerAdapter adapter=new SpinnerAdapter(this, R.layout.spinner_row,R.id.txt,list);
+        spinner.setAdapter(adapter);*/
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_npi_selected_swipe_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green, R.color.blue);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             listView.setNestedScrollingEnabled(true);
             mSwipeRefreshLayout.setNestedScrollingEnabled(true);
         }
-        signout.setOnClickListener(this);
+       // signout.setOnClickListener(this);
         refreah_button.setOnClickListener(this);
         Date today = Calendar.getInstance().getTime();
-
+            Log.i("Activity",""+today);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
         devicedate = formatter.format(today).replace("/"," ");
-
+        Log.i("devicedate",""+devicedate);
         SimpleDateFormat formatterday = new SimpleDateFormat("EEE/dd/MMM/yyyy");
 
         t_date.setText(formatterday.format(today).replace("/", " "));
@@ -127,9 +157,9 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                 SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
 
                 String datefrompicker = formatter.format(date);
+               // Log.i("onDateSelected",""+date);
 
-
-                Log.v(TAG,datefrompicker);
+               // Log.v(TAG,datefrompicker);
 
                 loadMeetingFromDB(datefrompicker);
             }
@@ -146,10 +176,134 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
             }
         });
 
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                // your code here
+                spinner.setBackgroundResource(R.drawable.hamburgerwhite);
+
+                switch (position){
+                    case 1:
+                        //Toast.makeText(JdialerStartupActivity.this,"Reset",Toast.LENGTH_SHORT).show();
+                        dropTable();
+                        insertDataToDb(devicedate);
+                        readEventsFromDB(devicedate);
+                        break;
+                    case 0:
+                       // Toast.makeText(JdialerStartupActivity.this,"reset",Toast.LENGTH_SHORT).show();
+
+                        break;
+
+                    case 2:
+                       // Toast.makeText(JdialerStartupActivity.this,"Exit",Toast.LENGTH_SHORT).show();
+                        showDialog("Are You Sure Want To Exit JDialer...?");
+                        break;
+                    case 3:
+                       // Toast.makeText(JdialerStartupActivity.this,"About App",Toast.LENGTH_SHORT).show();
+
+
+                        aboutAppDialog(getResources().getString(R.string.aboutapp_basic));
+                        break;
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+                parentView.setFocusable(false);
+                spinner.setBackgroundResource(R.drawable.hamburgerwhite);
+
+            }
+
+        });
+
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+   private void aboutAppDialog(String text){
+
+       AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+               JdialerStartupActivity.this);
+
+       LayoutInflater inflater= LayoutInflater.from(this);
+       View view=inflater.inflate(R.layout.dialog_alert_scrollable, null);
+
+        TextView textview=(TextView)view.findViewById(R.id.textmsg);
+                 textview.setText(text);
+         TextView textmore=(TextView)view.findViewById(R.id.textmore);
+         TextView textfeature=(TextView)view.findViewById(R.id.textfeature);
+                 textfeature.setText(getResources().getString(R.string.app_feature));
+
+       // set dialog message
+       alertDialogBuilder
+               .setTitle("About JDialer")
+               .setView(view)
+               .setCancelable(false)
+               .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog,int id) {
+                       // if this button is clicked, close
+                       // current activity
+                       dialog.cancel();
+                   }
+               });
+
+       // create alert dialog
+       final AlertDialog alertDialog = alertDialogBuilder.create();
+       textmore.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               alertDialog.dismiss();
+               appMoreDetails(getResources().getString(R.string.aboutapp));
+
+
+
+           }
+       });
+       // show it
+       alertDialog.show();
+
+    }
+
+    private void appMoreDetails(String details_text){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                JdialerStartupActivity.this);
+
+        LayoutInflater inflater= LayoutInflater.from(this);
+        View view=inflater.inflate(R.layout.app_more_details_dialog, null);
+        TextView textmore=(TextView)view.findViewById(R.id.more_details);
+        textmore.setText(details_text);
+        // set dialog message
+        alertDialogBuilder
+                .setTitle("About JDialer")
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -170,10 +324,6 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
         }
         readEventsFromDB(devicedate);
-
-
-
-
     }
 
 
@@ -184,20 +334,24 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                String date_from_evet = cursor.getString(
+              /*  String date_from_evet = cursor.getString(
                         cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8, 10) + " " +
                         cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4, 7) + " " +
-                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30, 34);
+                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30, 34);*/
                 //   Log.d("service ","date_from_evet: "+date_from_evet);
-                if (datafromcallandar.equalsIgnoreCase(date_from_evet)) {
+                Date datee= new Date(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)));
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+                String date = formatter.format(datee).toString().replace("/"," ");
+                if (datafromcallandar.equalsIgnoreCase(date)) {
                     readEventsFromDB(datafromcallandar);
                     // Log.d("service ","date equal");
                     mSwipeRefreshLayout.setEnabled(true);
 
                 }
-                if (!datafromcallandar.equalsIgnoreCase(date_from_evet)) {
+                if (!datafromcallandar.equalsIgnoreCase(date)) {
                     // readCurrentEventsFromCallender(datafromcallandar);
                     mSwipeRefreshLayout.setEnabled(false);
+                   // Log.d("calendar date ",datafromcallandar);
                     readInstances(datafromcallandar);
                     // Log.d("service ","date not equal");
 
@@ -210,19 +364,25 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, null, null, null, null, null);
         if (cursor!=null) {
             if (cursor.moveToFirst()) {
-                String date_from_evet =cursor.getString(
-                        cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+
+               /* String date_from_evet =cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8,10)+" "+
                         cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4,7)+" "+
-                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);
+                        cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30,34);*/
+
+
+               // Log.d("service ",date_from_evet);
+                Date datee= new Date(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)));
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+                String date = formatter.format(datee).toString().replace("/"," ");
+               // Log.d("service ",date);
                 //   Log.d("service ","date_from_evet: "+date_from_evet);
-                if (!s_devicedate.equalsIgnoreCase(date_from_evet))
+                if (!s_devicedate.equalsIgnoreCase(date))
                 {
                      // Log.d("service ","date not equal");
                     dropTable();
                     insertDataToDb(s_devicedate);
 
                 }
-                if (s_devicedate.equalsIgnoreCase(date_from_evet))
+                if (s_devicedate.equalsIgnoreCase(date))
                 {
                    // Log.d("service ","date equal");
                     updateTodayMeeting(s_devicedate);
@@ -325,7 +485,12 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     //
     private void insertDataToDb(String device_date) {
         // Uri  uri=null;
-        long now = System.currentTimeMillis();
+       // long now = System.currentTimeMillis();
+        Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        currentTime.set(Calendar.ZONE_OFFSET, TimeZone.getTimeZone("UTC").getRawOffset());
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, currentTime.get(Calendar.HOUR_OF_DAY));
+        long now = calendar.getTimeInMillis();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
 
@@ -356,19 +521,27 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         + " <= " + (now + 2592000000L) + " and " + CalendarContract.Instances.VISIBLE + " = 1",
                 null, CalendarContract.Instances.DTSTART + " ASC");
         try {
-            // Log.d(TAG,"1");
+             Log.d(TAG,"1");
             if (cursor != null) {
 
-                //  Log.d(TAG,"2");
+                  Log.d(TAG,"2");
                 if (cursor.moveToFirst()) {
 
                     do {
-                        // Log.d(TAG,"3");
+                       /*  Log.d(TAG,"3");
+
+                        Log.d(TAG+"tttt",cursor.getString(1));
+                        Log.d(TAG+"dddd",cursor.getString(2));
+                        Log.d(TAG,"device_date "+device_date);*/
+                        Date datee= new Date(cursor.getLong(3));
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+                       String date = formatter.format(datee).toString().replace("/"," ");
+                       // Log.d(TAG,"yyyyyyyyyyy "+date);
                         // String date_from_evet=new Date(cursor.getLong(3)).toString().substring(0, 10) + " " + (new Date(cursor.getLong(3))).toString().substring(30, 34);
-                        String date_from_evet =new Date(cursor.getLong(3)).toString().substring(8,10)+" "+new Date(cursor.getLong(3)).toString().substring(4,7)+" "+new Date(cursor.getLong(3)).toString().substring(30,34);
-                        // Log.d(TAG,"date_from_evet insert titles"+date_from_evet);
-                        // Log.d(TAG,"device_date insert details"+device_date);
-                        if (date_from_evet.equalsIgnoreCase(device_date.replace("-"," "))){
+                       // String date_from_evet =new Date(cursor.getLong(3)).toString().substring(8,10)+" "+new Date(cursor.getLong(3)).toString().substring(4,7)+" "+new Date(cursor.getLong(3)).toString().substring(30,34);
+                       //  Log.d(TAG,"date_from_evet insert titles"+date_from_evet);
+                      //   Log.d(TAG,"device_date insert details"+device_date);
+                        if (date.equalsIgnoreCase(device_date.replace("-"," "))){
 
                             String titles = cursor.getString(1);
                             String details =cursor.getString(2);
@@ -426,12 +599,16 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
             //  Log.i(TAG, "3");
             if (cursor.moveToFirst()) {
                 // Log.i(TAG, "4");
-                String date_from_evet = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8, 10) + " " + cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4, 7) + " " + cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30, 34);
+               // String date_from_evet = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8, 10) + " " + cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4, 7) + " " + cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30, 34);
+                Date datee= new Date(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)));
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+                String date = formatter.format(datee).toString().replace("/"," ");
+               // Log.d("service ",date);
                 do {
                   /*  Log.i(TAG, "event"+date_from_evet);
                     Log.i(TAG, "device"+devicedate);*/
                     // devicedate="06 Aug 2017";
-                    if (date_from_evet.equalsIgnoreCase(currentdate.replace("-", " "))) {
+                    if (date.equalsIgnoreCase(currentdate.replace("-", " "))) {
                         // Log.i(TAG, "6");
                         CallModel model = new CallModel();
                         String eventtitle = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT));
@@ -450,8 +627,15 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                        /* Log.i(TAG, "date and time---: " + (new Date(cursor.getLong(3))).toString().substring(0,3)+" "+(new Date(cursor.getLong(3))).toString().substring(8,10)+" "+(new Date(cursor.getLong(3))).toString().substring(4,7)+" "+(new Date(cursor.getLong(3))).toString().substring(30,34));*/
                         // model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
                         model.setTime(eventdateandtime.substring(11, 16));
-                        model.setTimezone("(" + eventdateandtime.substring(20, 29) + ")");
-                        model.setDate(eventdateandtime.substring(0, 10) + " " + eventdateandtime.substring(30, 34));
+                       // model.setTimezone("(" + eventdateandtime.substring(20, 29) + ")");
+                        Calendar cal = Calendar.getInstance();
+                        TimeZone tz = cal.getTimeZone();
+                        model.setTimezone("("+tz.getDisplayName(false, TimeZone.SHORT)+")");
+
+                        Date datee1= new Date(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)));
+                        SimpleDateFormat formatter1 = new SimpleDateFormat("dd/MMM/yyyy");
+                        String date2 = formatter1.format(datee1).toString().replace("/"," ");
+                        model.setDate(date2);
                        try {
                            String[] s_leadershi = eventdetails.split("Leadership");
                            String ss_leadershi=s_leadershi[1];
@@ -627,6 +811,12 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
         conference_call_model.clear();
         long now = System.currentTimeMillis();
+       /* Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        currentTime.set(Calendar.ZONE_OFFSET, TimeZone.getTimeZone("UTC").getRawOffset());
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, currentTime.get(Calendar.HOUR_OF_DAY));
+        long now=calendar.getTimeInMillis();*/
+       // Log.d("date2 recurence", ""+now);
 
         Uri.Builder eventsUriBuilder = CalendarContract.Instances.CONTENT_URI.buildUpon();
         ContentUris.appendId(eventsUriBuilder, Long.MIN_VALUE);
@@ -635,6 +825,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                 CalendarContract.Instances.DESCRIPTION, CalendarContract.Instances.BEGIN,
                 CalendarContract.Instances.END, CalendarContract.Instances.EVENT_LOCATION,
                 CalendarContract.Instances.EVENT_ID};
+
 
         Uri eventsUri = eventsUriBuilder.build();
         Cursor instance_cursor = getContentResolver().query(
@@ -646,13 +837,17 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
             if (instance_cursor != null) {
                 while (instance_cursor.moveToNext()) {
-                    // final String title = cursor.getString(0);
+
+
                     //String evetdate = new Date(instance_cursor.getLong(3)).toString().substring(0, 3) + " " + new Date(instance_cursor.getLong(3)).toString().substring(8, 10) + " " + new Date(instance_cursor.getLong(3)).toString().substring(4, 7) + " " + new Date(instance_cursor.getLong(3)).toString().substring(30, 34);
-                    String date_from_evet =new Date(instance_cursor.getLong(3)).toString().substring(8,10)+" "+new Date(instance_cursor.getLong(3)).toString().substring(4,7)+" "+new Date(instance_cursor.getLong(3)).toString().substring(30,34);
-                    //  Log.d("date recurence", date_from_evet);
-                    //  Log.d("date2 recurence", devicedate);
-                    // devicedate="02 Aug 2017";
-                    if (date_from_evet.equalsIgnoreCase(devicedate.replace("-", " "))) {
+                   // String date_from_evet =new Date(instance_cursor.getLong(3)).toString().substring(8,10)+" "+new Date(instance_cursor.getLong(3)).toString().substring(4,7)+" "+new Date(instance_cursor.getLong(3)).toString().substring(30,34);
+                    Date datee=  new Date(instance_cursor.getLong(3));
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+                    String date = formatter.format(datee).toString().replace("/"," ");
+                   // Log.d(TAG, "instance date"+date);
+                   // Log.d(TAG, "device date"+devicedate);
+                    if (date.equalsIgnoreCase(devicedate.replace("-", " "))) {
+                      //  Log.d(TAG, "device date"+devicedate);
               /* String title = instance_cursor.getString(1);
                 String details = instance_cursor.getString(2);
                 String date = new Date((instance_cursor.getLong(3))).toString();
@@ -668,6 +863,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
                         //  Log.d(TAG, "inside if instance");
                         String title = instance_cursor.getString(1);
+                       // Log.d(TAG, "title"+title);
                         CallModel model = new CallModel();
                         model.setTitle(instance_cursor.getString(1));
                         //  Log.i(TAG, "detailed: instance " + instance_cursor.getString(2));
@@ -678,8 +874,15 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         //  Log.i(TAG, " instance date and time---: " + (new Date(instance_cursor.getLong(3))).toString().substring(0, 3) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(8, 10) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(4, 7) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(30, 34));
                         // model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
                         model.setTime((new Date(instance_cursor.getLong(3))).toString().substring(11, 16));
-                        model.setTimezone("(" + (new Date(instance_cursor.getLong(3))).toString().substring(20, 29) + ")");
-                        model.setDate((new Date(instance_cursor.getLong(3))).toString().substring(0, 10) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(30, 34));
+                       // model.setTimezone("(" + (new Date(instance_cursor.getLong(3))).toString().substring(20, 29) + ")");
+                        Calendar cal = Calendar.getInstance();
+                        TimeZone tz = cal.getTimeZone();
+                        model.setTimezone("("+tz.getDisplayName(false, TimeZone.SHORT)+")");
+                        Date datee2=  new Date(instance_cursor.getLong(3));
+                        SimpleDateFormat formatter2 = new SimpleDateFormat("dd/MMM/yyyy");
+                        String date2 = formatter2.format(datee2).toString().replace("/"," ");
+                        /*model.setDate((new Date(instance_cursor.getLong(3))).toString().substring(0, 10) + " " + (new Date(instance_cursor.getLong(3))).toString().substring(30, 34));*/
+                        model.setDate(date2);
                         // String[] questionMarkTokens= instance_cursor.getString(2).split(".........................................................................................................................................");
                        // model.setLeadershipnumber("2345123");
                         // String beforeQuestionMark = questionMarkTokens[0];
@@ -781,7 +984,23 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     }*/
 
 
+    private String convertDateTimeZone(long originalDate) {
+        String newDate = "";
+        Date date = new Date(originalDate);
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        Date parsed = null;
+        try {
+            parsed = formatter.parse(formatter.format(date).toString());
+            TimeZone tz = TimeZone.getTimeZone("GMT");
+            SimpleDateFormat destFormat = new SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss");
+            destFormat.setTimeZone(tz);
 
+            newDate = destFormat.format(parsed);
+        } catch (Exception e) {
+        }
+        return newDate;
+    }
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -790,10 +1009,10 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
                 readEventsFromDB(devicedate);
                 break;
-            case R.id.signout:
-                showDialog("Are You Sure Want To Exit JDialer...?");
+         /* *//*  case R.id.signout:
+                showDialog("Are You Sure Want To Exit JDialer...?");*//*
 
-                break;
+                break;*/
         }
     }
     public void showDialog(String msg){

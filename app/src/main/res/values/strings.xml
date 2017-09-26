@@ -11,4 +11,45 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">fragment AllDays</string>
     <string name="hello_blank_fragment1">fragment current</string>
+    <string name="reset">Reset</string>
+    <string name="exit">Exit</string>
+    <string name="info">About App</string>
+    <string name="tab">\u0009</string>
+    <string name="string_with_html"><![CDATA[
+       <em>Hello</em> <strong>World</strong>!
+ ]]></string>
+    <string name="aboutapp">
+         1.App Version 1.5\n\n
+        2.JDialer App is for joining Conference call\n\t\t from the Android mobile. \n\n
+        3.App can be installed from the android \n\t\t\tVersion 5.0(Lollipop).\n\n
+        4.Android Device Calendar Must Sync With\n\t\t  OutLook Calendar.\n\n
+        5.After installing open the app, it will\n\t\t ask for the calendar read permission,\n\t\t please allow the permission.\n\n
+    note: if you deny the permission then app\n\t\t\t\t\t will not read any data from the\n\t\t\t\t\t calendar\n\n
+        6.If you denied the permission then please\n\t\t reinstall and open the app and allow the\n\t\t permission to read\n\n
+        7.These permissions are system level\n\t\t security permission must be allowed only\n\t\t at once on the beginning of the particular\n\t\t feature to use. It will not ask next time\n\t\t until you reinstall the app\n\n
+        8.After giving permission app will read your\n\t\t calendar and will list all your current day\n\t\t meeting\n\n
+        9.Each meeting details contains Title, Time,\n\t\t Date, Online meeting dialer number and\n\t\t the conference ID\n\n
+        10.To join the meeting dial the meeting by\n\t\t\t clicking the dialer symbol green button\n\n
+        11.While dialing app will asks for the call\n\t\t permission (system level permission must\n\t\t be allowed) will asks only once at the\n\t\t first time. It will not ask for the next time\n\t\t until you reinstall the app\n\n
+        12.After allowing the permissions, system\n\t\t has set the app to be ready to use the\n\t\t dialer feature from the app\n\n
+        13.Now the Dialer permission and calendar\n\t\t read permission is set and ready to be\n\t\t used in our app\n\n
+        14.App having options to Exit to quite the\n\t\t\t app\n\n
+        15.App having Reset options to reset App\n\t\t\t when we change the time Zone From One\n\t\t\t country to Another.\n\n
+        16.If Time zone is changed from one time\n\t\t\t one Another by Traveling Or By\n\t\t\t manually,App will convert the meeting to\n\t\t\t respective time zoone timings.and we\n\t\t\t need to sync.\n\n
+        17.We can join as leader if the meeting\n\t\t\t contains the Leadership PIN and the\n\t\t\t dialer button will be in the blue color.\n\n
+        18.For the same meeting you can join as\n\t\t\t the participant by pressing no when it\n\t\t\t asks for the Leadership PIN. and just\n\t\t\t record your name and join the meeting.
+
+</string>
+
+    <string name="aboutapp_basic">\n\t\t1.App Version 1.5\n\n\t\t2.App need minimum android Version\n\t\t\t 5.0(Lollipop)\n</string>
+    <string name="app_feature">\n\t\t 1.We Can Join Conference Meeting\n\t\t\t\t Through Phone.\n
+                                                   \n\t\t 2.We Can Join As Leader and Participient.\n
+                                                    \n\t\t 3.App Can adjust to time zone if we\n\t\t\t\t Change the time zone.\n</string>
+
+    <array name="viewtype">
+        <item>Select Option</item>
+        <item>Reset</item>
+        <item>Exit</item>
+        <item>About App</item>
+    </array>
 </resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <menu
+        xmlns:android="http://schemas.android.com/apk/res/android" >
+
+        <item
+            android:id="@+id/reset"
+            android:icon="@drawable/settings"
+            android:title="@string/reset" />
+
+        <item
+            android:id="@+id/signout"
+            android:icon="@drawable/signoutc"
+            android:title="@string/exit" />
+
+        <item
+            android:id="@+id/aboutapp"
+            android:icon="@drawable/infosign"
+            android:title="@string/info" />
+
+
+</menu>

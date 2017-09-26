@@ -3,27 +3,51 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
         android:paddingTop="10dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp">
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp">
 
+        <TextView
+          android:id="@+id/version_text"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:textStyle="bold"
+
+            android:text="Version:" />
         <TextView
             android:id="@+id/textmsg"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_below="@+id/version_text"
             android:text="" />
-        <Button
-            android:id="@+id/ok"
-            android:background="@color/colorPrimary"
-            android:layout_gravity="end"
-            android:text="ok"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/feature_text"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/textmsg"
+            android:textStyle="bold"
 
-    </LinearLayout>
+            android:text="Features:" />
+        <TextView
+            android:id="@+id/textfeature"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/feature_text"
+            android:text="" />
+        <TextView
+            android:id="@+id/textmore"
+            android:layout_below="@+id/textfeature"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:text="more>>>" />
+
+
+    </RelativeLayout>
 </ScrollView>

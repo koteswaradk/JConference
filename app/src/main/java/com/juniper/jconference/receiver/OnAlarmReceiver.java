@@ -19,7 +19,7 @@ public class OnAlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
-        WakefulIntentService.sendWakefulWork(context, ClockAppService.class);
+       // WakefulIntentService.sendWakefulWork(context, ClockAppService.class);
         PendingIntent service = null;
         Intent intentForService = new Intent(context.getApplicationContext(), EventsService.class);
         final AlarmManager alarmManager = (AlarmManager) context

@@ -67,11 +67,12 @@ public class ScreenOFFONReceiver extends BroadcastReceiver {
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, time.getTime().getTime(), 60, service);
             receivercontext.startService(intentForService);*/
 
-        }  if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+        }
+        if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
             // AND DO WHATEVER YOU NEED TO DO HERE
           //  System.out.println("USER PRESENT");
             wasScreenOn = true;
-            updateDBFromCalendar();
+           // updateDBFromCalendar();
           //  Toast.makeText(receivercontext,"userpresent",Toast.LENGTH_SHORT).show();
 
         } if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
