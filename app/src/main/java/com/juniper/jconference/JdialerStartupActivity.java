@@ -36,6 +36,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberMatch;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.juniper.jconference.adapter.InnerCallAdapter;
@@ -80,13 +81,13 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     private HorizontalCalendar horizontalCalendar;
     NoDefaultSpinner spinner;  boolean isSpinnerInitial = false;
     Toolbar toolbar;
+    String date_from_evet="data already inserted",datefromdb="no date from db",eventtitle1="no event title",instancedate="no instance date",insatncetitle="no instance title";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jdialer_startup);
 
         init();
-
 
     }
 
@@ -101,6 +102,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         list.add(new ItemData("Reset",R.drawable.settings));
         list.add(new ItemData("Exit",R.drawable.signoutc));
         list.add(new ItemData("About App",R.drawable.infosign));
+        list.add(new ItemData("Log Data",R.drawable.infosign));
 
         spinner=(NoDefaultSpinner)findViewById(R.id.spinner);
 
@@ -185,9 +187,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                 switch (position){
                     case 1:
                         //Toast.makeText(JdialerStartupActivity.this,"Reset",Toast.LENGTH_SHORT).show();
-                        dropTable();
-                        insertDataToDb(devicedate);
-                        readEventsFromDB(devicedate);
+                        appResetDialog();
                         break;
                     case 0:
                        // Toast.makeText(JdialerStartupActivity.this,"reset",Toast.LENGTH_SHORT).show();
@@ -203,6 +203,17 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
 
                         aboutAppDialog(getResources().getString(R.string.aboutapp_basic));
+                        break;
+                    case 4:
+                        // Toast.makeText(JdialerStartupActivity.this,"About App",Toast.LENGTH_SHORT).show();
+
+                        try
+                        {
+                            LogData(" Device date:"+devicedate+""+getResources().getString(R.string.space)+" First time data date: "+date_from_evet+getResources().getString(R.string.space)+" Date from DB: "+datefromdb+getResources().getString(R.string.space)+" Event form DB: "+eventtitle1+getResources().getString(R.string.space)+" Instance date: "+instancedate+getResources().getString(R.string.space)+" Instance title:"+insatncetitle);
+                        }catch ( NullPointerException e){
+
+                        }
+
                         break;
 
                 }
@@ -297,6 +308,71 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         dialog.cancel();
                     }
                 });
+
+        // create alert dialog
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
+    private void LogData(String details_text){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                JdialerStartupActivity.this);
+
+        LayoutInflater inflater= LayoutInflater.from(this);
+        View view=inflater.inflate(R.layout.app_more_details_dialog, null);
+        TextView textmore=(TextView)view.findViewById(R.id.more_details);
+        textmore.setText(details_text);
+        // set dialog message
+        alertDialogBuilder
+                .setTitle("Log Data...")
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
+    private void appResetDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                JdialerStartupActivity.this);
+
+        LayoutInflater inflater= LayoutInflater.from(this);
+        View view=inflater.inflate(R.layout.app_more_details_dialog, null);
+        TextView textmore=(TextView)view.findViewById(R.id.more_details);
+        textmore.setText(getResources().getString(R.string.app_reset));
+        // set dialog message
+        alertDialogBuilder
+                .setTitle("Reset JDialer")
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        dialog.cancel();
+                        dropTable();
+                        insertDataToDb(devicedate);
+                        readEventsFromDB(devicedate);
+                    }
+                })
+        .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int id) {
+                // if this button is clicked, close
+                // current activity
+                dialog.cancel();
+            }
+        });
+
 
         // create alert dialog
         final AlertDialog alertDialog = alertDialogBuilder.create();
@@ -536,7 +612,8 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         Date datee= new Date(cursor.getLong(3));
                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
                        String date = formatter.format(datee).toString().replace("/"," ");
-                       // Log.d(TAG,"yyyyyyyyyyy "+date);
+                         date_from_evet=date;
+                        // Log.d(TAG,"yyyyyyyyyyy "+date);
                         // String date_from_evet=new Date(cursor.getLong(3)).toString().substring(0, 10) + " " + (new Date(cursor.getLong(3))).toString().substring(30, 34);
                        // String date_from_evet =new Date(cursor.getLong(3)).toString().substring(8,10)+" "+new Date(cursor.getLong(3)).toString().substring(4,7)+" "+new Date(cursor.getLong(3)).toString().substring(30,34);
                        //  Log.d(TAG,"date_from_evet insert titles"+date_from_evet);
@@ -546,6 +623,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                             String titles = cursor.getString(1);
                             String details =cursor.getString(2);
                             String date_and_time_full= new Date((cursor.getLong(3))).toString();
+                            date_from_evet=date_and_time_full;
                          /*   Log.i(TAG,"insert date and time "+date_and_time_full);
                             Log.d(TAG,"insert titles"+titles);
                             Log.d(TAG,"insert details"+details);
@@ -608,13 +686,14 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                   /*  Log.i(TAG, "event"+date_from_evet);
                     Log.i(TAG, "device"+devicedate);*/
                     // devicedate="06 Aug 2017";
+                    datefromdb=date;
                     if (date.equalsIgnoreCase(currentdate.replace("-", " "))) {
                         // Log.i(TAG, "6");
                         CallModel model = new CallModel();
                         String eventtitle = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT));
                         String eventdateandtime = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME));
                         String eventdetails = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DETAILS));
-
+                        eventtitle1=eventtitle;
                         model.setTitle(eventtitle);
                        // Log.i(TAG + "fromdb", "eventdetails: " + eventdetails);
                      /*   Log.i(TAG + "fromdb", "eventtitle: " + eventtitle);
@@ -844,6 +923,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                     Date datee=  new Date(instance_cursor.getLong(3));
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
                     String date = formatter.format(datee).toString().replace("/"," ");
+                    instancedate=date;
                    // Log.d(TAG, "instance date"+date);
                    // Log.d(TAG, "device date"+devicedate);
                     if (date.equalsIgnoreCase(devicedate.replace("-", " "))) {
@@ -864,6 +944,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                         //  Log.d(TAG, "inside if instance");
                         String title = instance_cursor.getString(1);
                        // Log.d(TAG, "title"+title);
+                        insatncetitle=title;
                         CallModel model = new CallModel();
                         model.setTitle(instance_cursor.getString(1));
                         //  Log.i(TAG, "detailed: instance " + instance_cursor.getString(2));

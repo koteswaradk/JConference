@@ -155,7 +155,7 @@ public class InnerCallAdapter extends BaseAdapter {
 
 
 
-        setItems(conferencecallmodel,position,viewHolder);
+
 
         viewHolder.title_display.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,7 +209,7 @@ public class InnerCallAdapter extends BaseAdapter {
             }
 
         });*/
-
+        setItems(conferencecallmodel,position,viewHolder);
          notifyDataSetChanged();
 
         return convertView;
@@ -218,9 +218,9 @@ public class InnerCallAdapter extends BaseAdapter {
         android.support.v7.app.AlertDialog.Builder alertDialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
 
         LayoutInflater inflater= LayoutInflater.from(context);
-        View view=inflater.inflate(R.layout.dialog_alert_scrollable, null);
+        View view=inflater.inflate(R.layout.app_more_details_dialog, null);
 
-        TextView textview=(TextView)view.findViewById(R.id.textmsg);
+        TextView textview=(TextView)view.findViewById(R.id.more_details);
         textview.setText(reason);
 
 
@@ -798,7 +798,7 @@ public class InnerCallAdapter extends BaseAdapter {
 
     }
 
-    static class ViewHolder  {
+   public static class ViewHolder  {
         LinearLayout liner_layout;
         TextView time_display;
         TextView date_display;
