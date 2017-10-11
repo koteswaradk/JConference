@@ -1,22 +1,23 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+   <!-- <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:titleTextStyle">@style/NoTitleText</item>
-        <item name="android:subtitleTextStyle">@style/NoTitleText</item>
-
+     <!--   <item name="android:titleTextStyle">@style/NoTitleText</item>-->
         <item name="android:dropDownListViewStyle">@style/mySpinnerItemStyle</item>
         <item name="android:windowActionBar">false</item>
+       <!-- <item name="android:actionOverflowButtonStyle">@style/MyOverFlow</item>-->
 
     </style>
-    <style name="NoTitleText">
-        <item name="android:textSize">0sp</item>
+    <style name="NoTitleText" parent="@android:style/TextAppearance">
+        <item name="android:textSize">25sp</item>
         <item name="android:textColor">#00000000</item>
     </style>
+
     <style name="Theme.Transparent" parent="android:Theme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -30,6 +31,13 @@
         <item name="android:background">@drawable/hamburgerwhite</item>
         <item name="android:divider">@color/colorPrimary</item>
         <item name="android:dividerHeight">1dp</item>
+        <item name="android:dropDownWidth">1dp</item>
+
+    </style>
+    <style name="MyOverFlow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
+        <item name="android:src">@drawable/hamburgerwhite</item>
+        <item name="android:width">30dp</item>
+        <item name="android:height">30dp</item>
     </style>
 
 </resources>

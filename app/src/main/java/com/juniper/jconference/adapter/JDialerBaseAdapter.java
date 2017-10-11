@@ -387,7 +387,7 @@ public class JDialerBaseAdapter extends BaseAdapter{
                 if (!eventlist.getLeadershipnumber().toString().isEmpty()){
                     holder.leadership_display.setText(eventlist.getLeadershipnumber().toString());
                     holder.ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
-                    holder.leadership.setText("#;");
+                   // holder.leadership.setText("*;");
                 }if (eventlist.getLeadershipnumber().toString().isEmpty()){
                     holder.leadership_display.setVisibility(View.GONE);
                     holder.leadership.setVisibility(View.GONE);
@@ -451,7 +451,7 @@ public class JDialerBaseAdapter extends BaseAdapter{
                         holder.s_us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
                         holder.s_us_east_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
 
-                        holder.s_us_east_leadership.setText("#;");
+                        holder.s_us_east_leadership.setText("*;");
 
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
 
@@ -485,7 +485,7 @@ public class JDialerBaseAdapter extends BaseAdapter{
                         holder.s_us_west_leadership_display.setText(eventlist.getLeadershipnumber().toString());
                         holder.s_us_west_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
 
-                        holder.s_us_west_leadership.setText("#;");
+                        //holder.s_us_west_leadership.setText("*;");
 
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
 
@@ -523,8 +523,6 @@ public class JDialerBaseAdapter extends BaseAdapter{
             holder.india_leadership=(TextView)view_india.findViewById(R.id.india_leadership);
             holder.india_leadership_display=(TextView)view_india.findViewById(R.id.india_leadership_display);
 
-
-
             holder.us_east_displayplace.setText("USA East Coast"+" (TollFree)");
             holder.us_east_dialnumber_display.setText("+18446454399");
             holder.us_east_conferenceid_display.setText(eventlist.getConference());
@@ -557,13 +555,13 @@ public class JDialerBaseAdapter extends BaseAdapter{
                     holder.s_us_west_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
                     holder.s_us_east_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
 
-                    holder.us_west_leadership.setText("#;");
-                    holder.us_east_leadership.setText("#;");
+                   // holder.us_west_leadership.setText("*;");
+                  //  holder.us_east_leadership.setText("*;");
 
-                    holder.s_us_west_leadership.setText("#;");
-                    holder.s_us_east_leadership.setText("#;");
+                   // holder.s_us_west_leadership.setText("*;");
+                  //  holder.s_us_east_leadership.setText("*;");
 
-                    holder.india_leadership.setText("#;");
+                   // holder.india_leadership.setText("*;");
 
                 }if (eventlist.getLeadershipnumber().isEmpty()) {
                     holder.us_east_leadership_display.setVisibility(View.GONE);
@@ -865,6 +863,8 @@ public class JDialerBaseAdapter extends BaseAdapter{
         TextView ind_conferenceid_display;
         TextView ind_leadership;
         TextView ind_leadership_display;
+
+        TextView dial_symbol;
 
 
 

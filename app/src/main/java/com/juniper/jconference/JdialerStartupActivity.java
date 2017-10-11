@@ -1,6 +1,7 @@
 package com.juniper.jconference;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentUris;
@@ -10,6 +11,10 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Build;
@@ -21,9 +26,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -32,6 +44,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,6 +98,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_jdialer_startup);
 
         init();
@@ -92,6 +106,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     }
 
     private void init(){
+
         nomeetings = (TextView) findViewById(R.id.no_meeting_display);
         listView = (ListView) findViewById(R.id.list);
         refreah_button = (ImageButton) findViewById(R.id.refresh);
@@ -126,7 +141,56 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         SimpleDateFormat formatterday = new SimpleDateFormat("EEE/dd/MMM/yyyy");
 
         t_date.setText(formatterday.format(today).replace("/", " "));
+        getSupportActionBar().setElevation(0);
 
+        android.support.v7.app.ActionBar ab =  getSupportActionBar();
+        //ab.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FF4500")));
+
+        // Create a TextView programmatically.
+        TextView tv = new TextView(getApplicationContext());
+
+        // Create a LayoutParams for TextView
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT, // Width of TextView
+                RelativeLayout.LayoutParams.WRAP_CONTENT); // Height of TextView
+
+        // Apply the layout parameters to TextView widget
+        tv.setLayoutParams(lp);
+
+        // Set text to display in TextView
+        // This will set the ActionBar title text
+        tv.setText(formatterday.format(today).replace("/", " "));
+
+        // Set the text color of TextView
+        // This will change the ActionBar title text color
+        tv.setTextColor(Color.parseColor("#FFFFFF"));
+
+        // Center align the ActionBar title
+        tv.setGravity(Gravity.LEFT);
+
+        // Set the serif font for TextView text
+        // This will change ActionBar title text font
+       // tv.setTypeface(Typeface.SERIF, Typeface.ITALIC);
+
+        // Underline the ActionBar title text
+        //tv.setPaintFlags(tv.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+
+        // Set the ActionBar title font size
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP,26);
+
+        // Display a shadow around ActionBar title text
+       /* tv.setShadowLayer(
+                1.f, // radius
+                2.0f, // dx
+                2.0f, // dy
+                Color.parseColor("#FF8C00") // shadow color
+        );*/
+
+        // Set the ActionBar display option
+        ab.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+
+       // getSupportActionBar().setTitle(formatterday.format(today).replace("/", " "));
+        ab.setCustomView(tv);
         Calendar endDate = Calendar.getInstance();
         endDate.add(Calendar.MONTH, 1);
 
@@ -187,7 +251,8 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                 switch (position){
                     case 1:
                         //Toast.makeText(JdialerStartupActivity.this,"Reset",Toast.LENGTH_SHORT).show();
-                        appResetDialog();
+                        aboutAppDialog(getResources().getString(R.string.aboutapp_basic));
+
                         break;
                     case 0:
                        // Toast.makeText(JdialerStartupActivity.this,"reset",Toast.LENGTH_SHORT).show();
@@ -196,23 +261,24 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
                     case 2:
                        // Toast.makeText(JdialerStartupActivity.this,"Exit",Toast.LENGTH_SHORT).show();
-                        showDialog("Are You Sure Want To Exit JDialer...?");
+
+                        appResetDialog();
                         break;
                     case 3:
                        // Toast.makeText(JdialerStartupActivity.this,"About App",Toast.LENGTH_SHORT).show();
-
-
-                        aboutAppDialog(getResources().getString(R.string.aboutapp_basic));
-                        break;
-                    case 4:
-                        // Toast.makeText(JdialerStartupActivity.this,"About App",Toast.LENGTH_SHORT).show();
-
                         try
                         {
                             LogData(" Device date:"+devicedate+""+getResources().getString(R.string.space)+" First time data date: "+date_from_evet+getResources().getString(R.string.space)+" Date from DB: "+datefromdb+getResources().getString(R.string.space)+" Event form DB: "+eventtitle1+getResources().getString(R.string.space)+" Instance date: "+instancedate+getResources().getString(R.string.space)+" Instance title:"+insatncetitle);
                         }catch ( NullPointerException e){
 
                         }
+
+
+                        break;
+                    case 4:
+                        // Toast.makeText(JdialerStartupActivity.this,"About App",Toast.LENGTH_SHORT).show();
+
+                        showDialog("Are You Sure Want To Exit JDialer...?");
 
                         break;
 
@@ -235,13 +301,48 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
+
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId())
+        {
+            case R.id.reset:
+                // Single menu item is selected do something
+                // Ex: launching new activity/screen or show alert message
+               // Toast.makeText(JdialerStartupActivity.this, "reset is Selected", Toast.LENGTH_SHORT).show();
+                appResetDialog();
+                return true;
+
+            case R.id.signout:
+               // Toast.makeText(JdialerStartupActivity.this, "signout is Selected", Toast.LENGTH_SHORT).show();
+                showDialog("Are You Sure Want To Exit JDialer...?");
+                return true;
+
+            case R.id.aboutapp:
+              /*  Toast.makeText(JdialerStartupActivity.this, "aboutapp is Selected", Toast.LENGTH_SHORT).show();*/
+                aboutAppDialog(getResources().getString(R.string.aboutapp_basic));
+                return true;
+            case R.id.refresh:
+
+                moveToCurrentDateDialog("Move to today meeting date...?");
+                return true;
+            case R.id.logdata:
+                try
+                {
+                    LogData(" Device date:"+devicedate+""+getResources().getString(R.string.space)+" First time data date: "+date_from_evet+getResources().getString(R.string.space)+" Date from DB: "+datefromdb+getResources().getString(R.string.space)+" Event form DB: "+eventtitle1+getResources().getString(R.string.space)+" Instance date: "+instancedate+getResources().getString(R.string.space)+" Instance title:"+insatncetitle);
+                }catch ( NullPointerException e){
+
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
    private void aboutAppDialog(String text){
@@ -257,6 +358,10 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
          TextView textmore=(TextView)view.findViewById(R.id.textmore);
          TextView textfeature=(TextView)view.findViewById(R.id.textfeature);
                  textfeature.setText(getResources().getString(R.string.app_feature));
+       TextView newupdate=(TextView)view.findViewById(R.id.newupdates_text);
+
+       newupdate.setText(getResources().getString(R.string.newupdate));
+
 
        // set dialog message
        alertDialogBuilder
@@ -342,6 +447,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         // show it
         alertDialog.show();
     }
+
     private void appResetDialog(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 JdialerStartupActivity.this);
@@ -1065,23 +1171,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     }*/
 
 
-    private String convertDateTimeZone(long originalDate) {
-        String newDate = "";
-        Date date = new Date(originalDate);
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        Date parsed = null;
-        try {
-            parsed = formatter.parse(formatter.format(date).toString());
-            TimeZone tz = TimeZone.getTimeZone("GMT");
-            SimpleDateFormat destFormat = new SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss");
-            destFormat.setTimeZone(tz);
 
-            newDate = destFormat.format(parsed);
-        } catch (Exception e) {
-        }
-        return newDate;
-    }
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -1115,6 +1205,40 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                 dialog.dismiss();
                 finish();
                 System.exit(0);
+
+            }
+        });
+
+        button_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
+    }
+    public void moveToCurrentDateDialog(String msg){
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setContentView(R.layout.customdialog);
+        TextView text = (TextView) dialog.findViewById(R.id.text_dialog);
+        text.setText(msg);
+
+        Button button_cancel = (Button) dialog.findViewById(R.id.btn_cancel);
+        Button button_yes = (Button) dialog.findViewById(R.id.btn_yes);
+        button_yes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                horizontalCalendar.goToday(true);
+                updateDBFromCalender(devicedate);
+                loadMeetingFromDB(devicedate);
+                mSwipeRefreshLayout.setRefreshing(false);
+                dialog.dismiss();
 
             }
         });

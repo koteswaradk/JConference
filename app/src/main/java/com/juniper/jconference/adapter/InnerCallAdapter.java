@@ -120,96 +120,72 @@ public class InnerCallAdapter extends BaseAdapter {
             viewHolder.add_list_layout1=(LinearLayout) convertView.findViewById(R.id.add_list_layout1);
 
 
+            final CallModel conferencecallmodel = (CallModel) eventlist.get(position);
 
+            viewHolder.time_display.setText(conferencecallmodel.getTime());
+            viewHolder.time_zone_display.setText(conferencecallmodel.getTimezone());
+            viewHolder.date_display.setText(conferencecallmodel.getDate());
+            viewHolder.title_display.setText(conferencecallmodel.getTitle());
+            try{
+
+                {
+                    if (conferencecallmodel.getLeadershipnumber()==null){
+                        // viewHolder.leadership_pin_display.setText("Not Found");
+                        viewHolder.leadership_pin.setVisibility(View.GONE);
+                        viewHolder.leadership_pin_display.setVisibility(View.GONE);
+
+                    }
+                    if (conferencecallmodel.getLeadershipnumber()!=null) {
+                        viewHolder.leadership_pin.setVisibility(View.VISIBLE);
+                        viewHolder.leadership_pin_display.setVisibility(View.VISIBLE);
+                        viewHolder.leadership_pin_display.setText(conferencecallmodel.getLeadershipnumber());
+                    }
+
+                }
+
+            }catch (NullPointerException e){
+
+            }
+
+            viewHolder.title_display.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Log.d(TAG+"uuuuuuu",conferencecallmodel.getDetails());
+                    showInfoDialog(conferencecallmodel.getDetails());
+                }
+            });
+
+            if (!conferencecallmodel.getConference().isEmpty()){
+
+                viewHolder.list_layout_hide.setVisibility(View.VISIBLE);
+
+            }
+            if (conferencecallmodel.getConference().isEmpty()){
+                viewHolder.list_layout_hide.setVisibility(View.GONE);
+            }
+
+            final ViewHolder finalViewHolder = viewHolder;
+            viewHolder.hide_show_other.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if (b){
+                        finalViewHolder.liner_layout.setVisibility(View.VISIBLE);
+                        finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.subtractionsymbolbutton);
+                    }else {
+                        finalViewHolder.liner_layout.setVisibility(View.GONE);
+
+                        finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.add);
+                    }
+                }
+            });
+
+            setItems(conferencecallmodel,position,viewHolder);
             convertView.setTag(viewHolder);
         }else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final CallModel conferencecallmodel = (CallModel) eventlist.get(position);
 
-        viewHolder.time_display.setText(conferencecallmodel.getTime());
-        viewHolder.time_zone_display.setText(conferencecallmodel.getTimezone());
-        viewHolder.date_display.setText(conferencecallmodel.getDate());
-        viewHolder.title_display.setText(conferencecallmodel.getTitle());
-        try{
-
-            {
-                if (conferencecallmodel.getLeadershipnumber()==null){
-                    // viewHolder.leadership_pin_display.setText("Not Found");
-                    viewHolder.leadership_pin.setVisibility(View.GONE);
-                    viewHolder.leadership_pin_display.setVisibility(View.GONE);
-
-                }
-                if (conferencecallmodel.getLeadershipnumber()!=null) {
-                    viewHolder.leadership_pin.setVisibility(View.VISIBLE);
-                    viewHolder.leadership_pin_display.setVisibility(View.VISIBLE);
-                    viewHolder.leadership_pin_display.setText(conferencecallmodel.getLeadershipnumber());
-                }
-
-            }
-
-        }catch (NullPointerException e){
-
-        }
-
-
-
-
-
-        viewHolder.title_display.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Log.d(TAG+"uuuuuuu",conferencecallmodel.getDetails());
-                showInfoDialog(conferencecallmodel.getDetails());
-            }
-        });
-
-        if (!conferencecallmodel.getConference().isEmpty()){
-
-            viewHolder.list_layout_hide.setVisibility(View.VISIBLE);
-
-        }
-        if (conferencecallmodel.getConference().isEmpty()){
-            viewHolder.list_layout_hide.setVisibility(View.GONE);
-        }
-       /* for (int i = 0; i < conferencecallmodel.getNumberList().size(); i++){
-            String number=conferencecallmodel.getNumberList().get(i);
-            if((conferencecallmodel.getNumberList().size()==1)&&(!conferencecallmodel.getConference().isEmpty())&&(number.equalsIgnoreCase("18002660610"))){
-               *//* String indtolle= holder.display_place.getText().toString();
-                String ss=indtolle.concat("( TollFree)");
-                holder.display_place.setText(ss);*//*
-                viewHolder.liner_layout.setVisibility(View.GONE);
-                viewHolder.list_layout_hide.setVisibility(View.GONE);
-            }
-        }*/
-
-        final ViewHolder finalViewHolder = viewHolder;
-        viewHolder.hide_show_other.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b){
-                    finalViewHolder.liner_layout.setVisibility(View.VISIBLE);
-                    finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.subtractionsymbolbutton);
-                }else {
-                    finalViewHolder.liner_layout.setVisibility(View.GONE);
-
-                    finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.add);
-                }
-            }
-        });
-       /* viewHolder.list_layout_hide.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i(TAG,"onclick");
-
-                    finalViewHolder.liner_layout.setVisibility(View.VISIBLE);
-                    finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.subtractionsymbolbutton);
-                    expand=false;
-            }
-
-        });*/
-        setItems(conferencecallmodel,position,viewHolder);
          notifyDataSetChanged();
 
         return convertView;
@@ -293,78 +269,7 @@ public class InnerCallAdapter extends BaseAdapter {
             }
 
             holder.dialnumber_display.setText(eventlist.getNumberList().get(i));
-//            holder.leadership_display.setText(eventlist.getLeadershipnumber().toString());
-            /*try {
 
-                if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA East Coast")) {
-                    holder.dialnumber_display.setText("+18446454399");
-                    String s1=holder.display_place.getText().toString();
-                    String s2=s1.concat(" (TollFree)");
-                    holder.display_place.setText(s2);
-                }
-                if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA West Coast")) {
-                    holder.dialnumber_display.setText("+18446454398");
-                    String s3=holder.display_place.getText().toString();
-                    String s4=s3.concat(" (TollFree)");
-                    holder.display_place.setText(s4);
-                }
-                if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("India Bangalore")) {
-                    holder.dialnumber_display.setText("18002660610");
-                }
-
-                if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA West Coast")&&(eventlist.getNumberList().get(i).equalsIgnoreCase("+18446454398"))) {
-                    holder.display_place.setText("India Bangalore");
-                    holder.dialnumber_display.setText("18002660610");
-                }
-
-                if (number_place_map.get(eventlist.getNumberList().get(i)).equalsIgnoreCase("USA East Coast")&&(eventlist.getNumberList().get(i).equalsIgnoreCase("+18446454399"))) {
-                    holder.display_place.setText("India Bangalore");
-
-                    holder.dialnumber_display.setText("18002660610");
-
-                }
-
-            }catch (NullPointerException e){
-
-            }*/
-
-
-          /*  if ((holder.dialnumber_display.getText().toString().equalsIgnoreCase("18002660323"))){
-                holder.dialnumber_display.setText("+18446454398");
-                holder.display_place.setText(number_place_map.get(holder.dialnumber_display.getText().toString()));
-                String s3=holder.display_place.getText().toString();
-                String s4=s3.concat(" (TollFree)");
-                holder.display_place.setText(s4);
-                holder.us_east_displayplace=(TextView)view_us_east.findViewById(R.id.us_east_display_place);
-                holder.us_east_dialnumber_display=(TextView)view_us_east.findViewById(R.id.us_east_dialnumber_display);
-                holder.us_east_conferenceid=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid);
-                holder.us_east_conferenceid_display=(TextView)view_us_east.findViewById(R.id.us_east_conferenceid_display);
-                holder.us_east_leadership=(TextView)view_us_east.findViewById(R.id.us_east_leadership);
-                holder.us_east_leadership_display=(TextView)view_us_east.findViewById(R.id.us_east_leadership_display);
-
-                holder.us_east_displayplace.setText("USA East Coast"+" (TollFree)");
-                holder.us_east_dialnumber_display.setText("+18446454399");
-                holder.us_east_conferenceid_display.setText(eventlist.getConference());
-
-                try {
-                    if (!eventlist.getLeadershipnumber().isEmpty()){
-                        holder.us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
-                        holder.us_east_leadership.setText("#;");
-
-                    }if (eventlist.getLeadershipnumber().isEmpty()) {
-                        holder.us_east_leadership_display.setVisibility(View.GONE);
-                        holder.us_east_leadership.setVisibility(View.GONE);
-
-                    }
-                }catch (NullPointerException e){
-
-                }
-
-
-
-                // holder.liner_layout.addView(view_us_east);
-
-            }*/
 
             if(holder.dialnumber_display.getText().toString().equalsIgnoreCase("18002660323")){
                 holder.display_place.setText("India Toll Number ");
@@ -389,7 +294,7 @@ public class InnerCallAdapter extends BaseAdapter {
                 if (!eventlist.getLeadershipnumber().toString().isEmpty()){
                     holder.leadership_display.setText(eventlist.getLeadershipnumber().toString());
                     holder.ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
-                    holder.leadership.setText("#;");
+                    holder.leadership.setText("*;");
                 }if (eventlist.getLeadershipnumber().toString().isEmpty()){
                     holder.leadership_display.setVisibility(View.GONE);
                     holder.leadership.setVisibility(View.GONE);
@@ -399,40 +304,7 @@ public class InnerCallAdapter extends BaseAdapter {
 
             }
 
-           /* if ((!eventlist.getConference().isEmpty())&&(!holder.dialnumber_display.getText().toString().equalsIgnoreCase("+19785898300"))){
 
-
-
-                holder.ind_displayplace=(TextView)view_ind.findViewById(R.id.ind_display_place);
-                holder.ind_dialnumber_display=(TextView)view_ind.findViewById(R.id.ind_dialnumber_display);
-                holder.ind_conferenceid=(TextView)view_ind.findViewById(R.id.ind_conferenceid);
-                holder.ind_conferenceid_display=(TextView)view_ind.findViewById(R.id.ind_conferenceid_display);
-                holder.ind_leadership=(TextView)view_ind.findViewById(R.id.ind_leadership);
-                holder.ind_leadership_display=(TextView)view_ind.findViewById(R.id.ind_leadership_display);
-
-                holder.ind_displayplace.setText("USA East"+" (Toll Number)");
-                holder.ind_dialnumber_display.setText("+19785898300");
-                holder.ind_conferenceid_display.setText(eventlist.getConference());
-                try {
-                    if (!eventlist.getLeadershipnumber().isEmpty()){
-
-                        holder.ind_leadership_display.setText(eventlist.getLeadershipnumber().toString());
-                        holder.ind_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
-
-                        holder.ind_leadership.setText("#;");
-
-                    }if (eventlist.getLeadershipnumber().isEmpty()) {
-
-                        holder.ind_leadership_display.setVisibility(View.GONE);
-                        holder.ind_leadership.setVisibility(View.GONE);
-                    }
-                }catch (NullPointerException e){
-
-                }
-                holder.liner_layout.removeAllViews();
-                holder.liner_layout.addView(view_ind);
-
-            }*/
             if ((size==1)&&(!eventlist.getConference().isEmpty())&&(!number.equalsIgnoreCase("+19785898300"))){
 
 
@@ -453,7 +325,7 @@ public class InnerCallAdapter extends BaseAdapter {
                         holder.s_us_east_leadership_display.setText(eventlist.getLeadershipnumber().toString());
                         holder.s_us_east_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
 
-                        holder.s_us_east_leadership.setText("#;");
+                        holder.s_us_east_leadership.setText("*;");
 
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
 
@@ -478,7 +350,7 @@ public class InnerCallAdapter extends BaseAdapter {
                 holder.s_us_west_leadership=(TextView)s_view_us_west.findViewById(R.id.s_us_west_leadership);
                 holder.s_us_west_leadership_display=(TextView)s_view_us_west.findViewById(R.id.s_us_west_leadership_display);
 
-                holder.s_us_west_displayplace.setText("USA West "+" (Toll Number)");
+                holder.s_us_west_displayplace.setText("USA West"+" (Toll Number)");
                 holder.s_us_west_dialnumber_display.setText("+14089369000");
                 holder.s_us_west_conferenceid_display.setText(eventlist.getConference());
                 try {
@@ -487,7 +359,7 @@ public class InnerCallAdapter extends BaseAdapter {
                         holder.s_us_west_leadership_display.setText(eventlist.getLeadershipnumber().toString());
                         holder.s_us_west_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
 
-                        holder.s_us_west_leadership.setText("#;");
+                        holder.s_us_west_leadership.setText("*;");
 
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
 
@@ -559,13 +431,13 @@ public class InnerCallAdapter extends BaseAdapter {
                         holder.s_us_west_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
                         holder.s_us_east_ib_call.setBackgroundResource(R.drawable.dialer_color_selector);
 
-                        holder.us_west_leadership.setText("#;");
-                        holder.us_east_leadership.setText("#;");
+                        holder.us_west_leadership.setText("*;");
+                        holder.us_east_leadership.setText("*;");
 
-                        holder.s_us_west_leadership.setText("#;");
-                        holder.s_us_east_leadership.setText("#;");
+                        holder.s_us_west_leadership.setText("*;");
+                        holder.s_us_east_leadership.setText("*;");
 
-                        holder.india_leadership.setText("#;");
+                        holder.india_leadership.setText("*;");
 
                     }if (eventlist.getLeadershipnumber().isEmpty()) {
                         holder.us_east_leadership_display.setVisibility(View.GONE);
@@ -617,7 +489,7 @@ public class InnerCallAdapter extends BaseAdapter {
                     Log.d("leadership",leadership);*/
                     if (leadership.isEmpty()) {
                         dialNumberWithPermision(callPhoneNumber, callConferenceId);
-                        Log.d("empty","--");
+                       // Log.d("empty","--");
                     }else {
                         dialNumberWithLeader(callPhoneNumber, callConferenceId,leadership);
                     }
@@ -634,7 +506,7 @@ public class InnerCallAdapter extends BaseAdapter {
                     Log.d("leadership",leadership);*/
                     if (leadership.isEmpty()) {
                         dialNumberWithPermision(callPhoneNumber, callConferenceId);
-                        Log.d("empty","--");
+                       // Log.d("empty","--");
                     }
                     else {
                         dialNumberWithLeader(callPhoneNumber, callConferenceId,leadership);
@@ -653,7 +525,7 @@ public class InnerCallAdapter extends BaseAdapter {
                     Log.d("leadership",leadership);*/
                     if (leadership.isEmpty()) {
                         dialNumberWithPermision(callPhoneNumber, callConferenceId);
-                        Log.d("empty","--");
+                       // Log.d("empty","--");
                     }else {
                         dialNumberWithLeader(callPhoneNumber, callConferenceId,leadership);
                     }
@@ -673,7 +545,7 @@ public class InnerCallAdapter extends BaseAdapter {
                     Log.d("leadership",leadership);*/
                     if (leadership.isEmpty()) {
                         dialNumberWithPermision(callPhoneNumber, callConferenceId);
-                        Log.d("empty", "--");
+                       // Log.d("empty", "--");
                     } else {
                         dialNumberWithLeader(callPhoneNumber, callConferenceId, leadership);
                     }
@@ -695,7 +567,7 @@ public class InnerCallAdapter extends BaseAdapter {
                     Log.d("leadership",leadership);*/
                     if (leadership.isEmpty()) {
                         dialNumberWithPermision(callPhoneNumber, callConferenceId);
-                        Log.d("empty", "--");
+                       // Log.d("empty", "--");
                     } else {
                         dialNumberWithLeader(callPhoneNumber, callConferenceId, leadership);
                     }

@@ -14,6 +14,7 @@
     <string name="reset">Reset</string>
     <string name="exit">Exit</string>
     <string name="info">About App</string>
+    <string name="logdata">Log data</string>
     <string name="tab">\u0009</string>
     <string name="string_with_html"><![CDATA[
        <em>Hello</em> <strong>World</strong>!
@@ -35,17 +36,27 @@
         13. For the same meeting you can join as\n\t\t\t the participant by pressing NO when it\n\t\t\t asks for the leadership PIN. and just\n\t\t\t record your name and join the meeting.\n\n
         14. We have swipe to refresh for the current\n\t\t\t day meeting, just swipe the view, app\n\t\t\t will refresh and reload the current day\n\t\t\t meetings.
 </string>
+    <string name="newupdate">
+        \t\t1. Select option text removed from the\n\t\t\t dropdown menu.\n\n
+        \t\t2. # Added at the end of the number\n\t\t\t string display.\n\n
+        \t\t3. Padding is added at the botton left and\n\t\t\t other sides.\n\n
+        \t\t4. + Button moved to center of the view.\n\n
+        \t\t5. + Button size is increased.\n\n
+        \t\t6. Icon for menu and move to current\n\t\t\t date meetings is changed.\n\n
+        \t\t7. Smooth scrolling is handled.\n\n
+        \t\t8. Alertdialog is added to move to current\n\t\t\t date meetings.\n
+    </string>
 
-    <string name="aboutapp_basic">\n\t\t1.App Version 1.5\n\n\t\t</string>
+    <string name="aboutapp_basic">\t\t\t1.App Version 1.6\n\t\t</string>
     <string name="space">\n</string>
-    <string name="app_feature">\n\t\t 1.We can join conference meeting\n\t\t\t\t through phone.\n
+    <string name="app_feature">\t\t 1.We can join conference meeting\n\t\t\t\t through phone.\n
                                                    \n\t\t 2.We can join meetings as leader and\n\t\t\t\t participant.\n</string>
     <string name="app_reset">Is device time zone is changed...?\n\n Do you want to reset app data to changed time zone...?</string>
     <array name="viewtype">
-        <item>Select Option</item>
-        <item>Reset</item>
-        <item>Exit</item>
+        <item>[Select option below]</item>
         <item>About App</item>
+        <item>Reset</item>
         <item>Log Data</item>
+        <item>Exit</item>
     </array>
 </resources>
