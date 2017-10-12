@@ -570,8 +570,6 @@ public class InnerCallAdapter extends BaseAdapter {
                     } else {
                         dialNumberWithLeader(callPhoneNumber, callConferenceId, leadership);
                     }
-
-
                 }
             });
             holder.india_ib_call.setOnClickListener(new View.OnClickListener() {
@@ -581,7 +579,6 @@ public class InnerCallAdapter extends BaseAdapter {
                     callConferenceId = ((TextView) view_india.findViewById(R.id.india_conferenceid_display)).getText().toString();
 
                     leadership = ((TextView) view_india.findViewById(R.id.india_leadership_display)).getText().toString();
-
 
                    /* Log.i("conferenceid", callConferenceId);
                     Log.i("callPhoneNumber", callPhoneNumber);

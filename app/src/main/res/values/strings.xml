@@ -43,11 +43,11 @@
         \t\t4. + Button moved to center of the view.\n\n
         \t\t5. + Button size is increased.\n\n
         \t\t6. Icon for menu and move to current\n\t\t\t date meetings is changed.\n\n
-        \t\t7. Smooth scrolling is handled.\n\n
-        \t\t8. Alertdialog is added to move to current\n\t\t\t date meetings.\n
+        \t\t7. Alertdialog is added to move to current\n\t\t\t date meetings.\n\n
+        \t\t7. Move to today date will work when we\n\t\t\t are not in the current day meetings.\n\n
     </string>
 
-    <string name="aboutapp_basic">\t\t\t1.App Version 1.6\n\t\t</string>
+    <string name="aboutapp_basic">\t\t\t1.App Version 1.7\n\t\t</string>
     <string name="space">\n</string>
     <string name="app_feature">\t\t 1.We can join conference meeting\n\t\t\t\t through phone.\n
                                                    \n\t\t 2.We can join meetings as leader and\n\t\t\t\t participant.\n</string>

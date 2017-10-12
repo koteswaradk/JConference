@@ -17,6 +17,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.nfc.Tag;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
@@ -94,6 +95,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
     private HorizontalCalendar horizontalCalendar;
     NoDefaultSpinner spinner;  boolean isSpinnerInitial = false;
     Toolbar toolbar;
+    String datefrompicker;
     String date_from_evet="data already inserted",datefromdb="no date from db",eventtitle1="no event title",instancedate="no instance date",insatncetitle="no instance title";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,7 +224,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
                 SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
 
-                String datefrompicker = formatter.format(date);
+                 datefrompicker = formatter.format(date);
                // Log.i("onDateSelected",""+date);
 
                // Log.v(TAG,datefrompicker);
@@ -268,7 +270,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                        // Toast.makeText(JdialerStartupActivity.this,"About App",Toast.LENGTH_SHORT).show();
                         try
                         {
-                            LogData(" Device date:"+devicedate+""+getResources().getString(R.string.space)+" First time data date: "+date_from_evet+getResources().getString(R.string.space)+" Date from DB: "+datefromdb+getResources().getString(R.string.space)+" Event form DB: "+eventtitle1+getResources().getString(R.string.space)+" Instance date: "+instancedate+getResources().getString(R.string.space)+" Instance title:"+insatncetitle);
+                            LogData("Device date:"+devicedate+""+getResources().getString(R.string.space)+" First time data date: "+date_from_evet+getResources().getString(R.string.space)+" Date from DB: "+datefromdb+getResources().getString(R.string.space)+" Event form DB: "+eventtitle1+getResources().getString(R.string.space)+" Instance date: "+instancedate+getResources().getString(R.string.space)+" Instance title:"+insatncetitle);
                         }catch ( NullPointerException e){
 
                         }
@@ -278,7 +280,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                     case 4:
                         // Toast.makeText(JdialerStartupActivity.this,"About App",Toast.LENGTH_SHORT).show();
 
-                        showDialog("Are You Sure Want To Exit JDialer...?");
+                        showDialog("Sure Want To Exit JDialer...?");
 
                         break;
 
@@ -320,7 +322,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
             case R.id.signout:
                // Toast.makeText(JdialerStartupActivity.this, "signout is Selected", Toast.LENGTH_SHORT).show();
-                showDialog("Are You Sure Want To Exit JDialer...?");
+                showDialog("Sure You Want To Exit JDialer...?");
                 return true;
 
             case R.id.aboutapp:
@@ -328,8 +330,9 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
                 aboutAppDialog(getResources().getString(R.string.aboutapp_basic));
                 return true;
             case R.id.refresh:
-
-                moveToCurrentDateDialog("Move to today meeting date...?");
+                if (!datefrompicker.equalsIgnoreCase(devicedate.replace("-"," "))){
+                    moveToCurrentDateDialog("Load today date meetings...?");
+                }
                 return true;
             case R.id.logdata:
                 try
@@ -506,6 +509,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
         }
         readEventsFromDB(devicedate);
+       //new readMeetingFromDB().execute(devicedate);
     }
 
 
@@ -1251,5 +1255,163 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
         });
         dialog.show();
 
+    }
+    private class readMeetingFromDB extends AsyncTask<String,Void,ArrayList<CallModel>>{
+
+        @Override
+        protected ArrayList<CallModel> doInBackground(String... strings) {
+            conference_call_model.clear();
+            String currentdate = strings[0];
+            try{
+                String[] column = new String[]{"Distinct "+EventsDBHelper.KEY_CURRE_EVENT, EventsDBHelper.KEY_CURRE_DATE_TIME, EventsDBHelper.KEY_CURRE_DETAILS};
+                Cursor cursor = getContentResolver().query(Provider.CONTENT_CURRENT_EVENTS_URI, column, null, null, null, null);
+                if (cursor != null) {
+                    //  Log.i(TAG, "3");
+                    if (cursor.moveToFirst()) {
+                        // Log.i(TAG, "4");
+                        // String date_from_evet = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(8, 10) + " " + cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(4, 7) + " " + cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)).substring(30, 34);
+                        Date datee= new Date(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)));
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+                        String date = formatter.format(datee).toString().replace("/"," ");
+                        // Log.d("service ",date);
+                        do {
+                  /*  Log.i(TAG, "event"+date_from_evet);
+                    Log.i(TAG, "device"+devicedate);*/
+                            // devicedate="06 Aug 2017";
+                            datefromdb=date;
+                            if (date.equalsIgnoreCase(currentdate.replace("-", " "))) {
+                                // Log.i(TAG, "6");
+                                CallModel model = new CallModel();
+                                String eventtitle = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_EVENT));
+                                String eventdateandtime = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME));
+                                String eventdetails = cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DETAILS));
+                                eventtitle1=eventtitle;
+                                model.setTitle(eventtitle);
+                                // Log.i(TAG + "fromdb", "eventdetails: " + eventdetails);
+                     /*   Log.i(TAG + "fromdb", "eventtitle: " + eventtitle);
+                        Log.i(TAG, "fromdb: " + eventdateandtime);
+                        Log.i(TAG + "fromdb", "eventdetails: " + eventdetails);*/
+                                //print values on log
+
+                                // titleList.add(title);
+//                        Log.i(TAG+"fromdb", "date and time: " + (new Date(cursor.getLong(3))).toString());
+                       /* Log.i(TAG, "date and time---: " + (new Date(cursor.getLong(3))).toString().substring(0,3)+" "+(new Date(cursor.getLong(3))).toString().substring(8,10)+" "+(new Date(cursor.getLong(3))).toString().substring(4,7)+" "+(new Date(cursor.getLong(3))).toString().substring(30,34));*/
+                                // model.setTime((new Date(cursor.getLong(3))).toString().substring(11, 16));
+                                model.setTime(eventdateandtime.substring(11, 16));
+                                // model.setTimezone("(" + eventdateandtime.substring(20, 29) + ")");
+                                Calendar cal = Calendar.getInstance();
+                                TimeZone tz = cal.getTimeZone();
+                                model.setTimezone("("+tz.getDisplayName(false, TimeZone.SHORT)+")");
+
+                                Date datee1= new Date(cursor.getString(cursor.getColumnIndex(EventsDBHelper.KEY_CURRE_DATE_TIME)));
+                                SimpleDateFormat formatter1 = new SimpleDateFormat("dd/MMM/yyyy");
+                                String date2 = formatter1.format(datee1).toString().replace("/"," ");
+                                model.setDate(date2);
+                                try {
+                                    String[] s_leadershi = eventdetails.split("Leadership");
+                                    String ss_leadershi=s_leadershi[1];
+
+                                    String substring=ss_leadershi.substring(1,15);
+
+                                    String leadershipnumber=substring.replaceAll("[^0-9]", "");
+                                    if (leadershipnumber.matches("[0-9]+") && leadershipnumber.length() > 2) {
+                                        model.setLeadershipnumber(leadershipnumber);
+                                    }if (leadershipnumber.isEmpty()) {
+                                        // model.setLeadershipnumber("Not Found");
+                                    }
+
+                                }catch (ArrayIndexOutOfBoundsException e){
+
+                                }
+
+                                String[] questionJoin_by_Phone = eventdetails.split("Join by Phone");
+                                String beforeQuestionMark = questionJoin_by_Phone[0];
+                                if(beforeQuestionMark.contains("https://meet.juniper.net")){
+                                    //  Log.d(TAG,"present");
+                                    model.setMeetJuniperPresent(true);
+                                }else {
+                                    // Log.d(TAG,"not present");
+                                    model.setMeetJuniperPresent(false);
+                                }
+                                // beforeQuestionMark.replace("."," ");
+                                model.setDetails(eventdetails);
+
+                                //  Log.i(TAG, "details: " + beforeQuestionMark.replace(".",""));
+                                // dataAndTimeList.add((new Date(cursor.getLong(3))).toString());
+                                model.setDateandtime(eventdateandtime);
+                                if (getConferenceId(eventdetails) != null) {
+                                    // Log.d(TAG, "Conference ID" + getConferenceId(eventdetails));
+                                    model.setConference(getConferenceId(eventdetails));
+                                }
+                                ArrayList<String> plist = extractPhoneNumber(eventdetails);
+                                // model.setPhNumber(cursor.getString(2));
+                                Set<String> hs = new HashSet<>();
+                                hs.addAll(plist);
+                                plist.clear();
+                                plist.addAll(hs);
+                                Collections.reverse(plist);
+                                model.setNumberList(plist);
+
+                                for (int i = 0; i < plist.size(); i++) {
+
+                                    // Log.i(Tag+"Phone Number list",plist.get(i).replace(" ",""));
+                                    model.setPhNumber(plist.get(i));
+                                    // Log.i(TAG + "Phone Number ", plist.get(i));
+
+                                }
+
+
+                        /*HashSet<CallModel> modelHashSet=new HashSet<>();
+                        modelHashSet.addAll(conference_call_model);*/
+
+                                conference_call_model.add(model);
+
+                        /*Log.d("Title"+"date from cursor",eventtitle);
+                        Log.d("DateAndTime"+"from cursor",eventdateandtime);
+                        Log.d("deatils"+"from cursor",eventdetails);*/
+                            }
+
+
+                        } while (cursor.moveToNext());
+
+
+                    }
+                }
+                if (cursor == null) {
+                    //  Log.d(TAG+"cursor==null","cursor==null");
+
+                }
+            }
+            catch(SQLiteException e)   {
+
+            }
+            return conference_call_model;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<CallModel> callModels) {
+            super.onPostExecute(callModels);
+            if (!conference_call_model.isEmpty()) {
+                //  Log.d(TAG, "not empty-");
+                listView.setVisibility(View.VISIBLE);
+                nomeetings.setVisibility(View.GONE);
+                //jdialerdapter=new JDialerBaseAdapter(this,conference_call_model);
+                innsercallAdapter =new InnerCallAdapter(JdialerStartupActivity.this,callModels);
+                // adapter = new ListviewInsideListAdapter(this,conference_call_model);
+                // timezoneadapter=new TimeZoneCallAdapter(this,conference_call_model);
+                // listView.setAdapter(adapter);
+                // listView.setAdapter(jdialerdapter);
+                listView.setAdapter(innsercallAdapter);
+                // jdialerdapter.notifyDataSetChanged();
+                // adapter.notifyDataSetChanged();
+                innsercallAdapter.notifyDataSetChanged();
+
+            }
+            if (conference_call_model.isEmpty()) {
+                //  Log.d(TAG, " empty-");
+                listView.setVisibility(View.GONE);
+                nomeetings.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }

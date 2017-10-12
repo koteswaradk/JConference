@@ -44,7 +44,7 @@
             android:layout_height="fill_parent"
             android:layout_below="@+id/textfeature"
             android:textStyle="bold"
-            android:text=" New updates to version 1.6:" />
+            android:text=" New updates to version 1.7:" />
         <TextView
             android:id="@+id/newupdates_text"
             android:layout_width="fill_parent"
