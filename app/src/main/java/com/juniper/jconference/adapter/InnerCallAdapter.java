@@ -120,71 +120,71 @@ public class InnerCallAdapter extends BaseAdapter {
             viewHolder.add_list_layout1=(LinearLayout) convertView.findViewById(R.id.add_list_layout1);
 
 
-            final CallModel conferencecallmodel = (CallModel) eventlist.get(position);
 
-            viewHolder.time_display.setText(conferencecallmodel.getTime());
-            viewHolder.time_zone_display.setText(conferencecallmodel.getTimezone());
-            viewHolder.date_display.setText(conferencecallmodel.getDate());
-            viewHolder.title_display.setText(conferencecallmodel.getTitle());
-            try{
-
-                {
-                    if (conferencecallmodel.getLeadershipnumber()==null){
-                        // viewHolder.leadership_pin_display.setText("Not Found");
-                        viewHolder.leadership_pin.setVisibility(View.GONE);
-                        viewHolder.leadership_pin_display.setVisibility(View.GONE);
-
-                    }
-                    if (conferencecallmodel.getLeadershipnumber()!=null) {
-                        viewHolder.leadership_pin.setVisibility(View.VISIBLE);
-                        viewHolder.leadership_pin_display.setVisibility(View.VISIBLE);
-                        viewHolder.leadership_pin_display.setText(conferencecallmodel.getLeadershipnumber());
-                    }
-
-                }
-
-            }catch (NullPointerException e){
-
-            }
-
-            viewHolder.title_display.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Log.d(TAG+"uuuuuuu",conferencecallmodel.getDetails());
-                    showInfoDialog(conferencecallmodel.getDetails());
-                }
-            });
-
-            if (!conferencecallmodel.getConference().isEmpty()){
-
-                viewHolder.list_layout_hide.setVisibility(View.VISIBLE);
-
-            }
-            if (conferencecallmodel.getConference().isEmpty()){
-                viewHolder.list_layout_hide.setVisibility(View.GONE);
-            }
-
-            final ViewHolder finalViewHolder = viewHolder;
-            viewHolder.hide_show_other.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if (b){
-                        finalViewHolder.liner_layout.setVisibility(View.VISIBLE);
-                        finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.subtractionsymbolbutton);
-                    }else {
-                        finalViewHolder.liner_layout.setVisibility(View.GONE);
-
-                        finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.add);
-                    }
-                }
-            });
-
-            setItems(conferencecallmodel,position,viewHolder);
             convertView.setTag(viewHolder);
         }else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+        final CallModel conferencecallmodel = (CallModel) eventlist.get(position);
 
+        viewHolder.time_display.setText(conferencecallmodel.getTime());
+        viewHolder.time_zone_display.setText(conferencecallmodel.getTimezone());
+        viewHolder.date_display.setText(conferencecallmodel.getDate());
+        viewHolder.title_display.setText(conferencecallmodel.getTitle());
+        try{
+
+            {
+                if (conferencecallmodel.getLeadershipnumber()==null){
+                    // viewHolder.leadership_pin_display.setText("Not Found");
+                    viewHolder.leadership_pin.setVisibility(View.GONE);
+                    viewHolder.leadership_pin_display.setVisibility(View.GONE);
+
+                }
+                if (conferencecallmodel.getLeadershipnumber()!=null) {
+                    viewHolder.leadership_pin.setVisibility(View.VISIBLE);
+                    viewHolder.leadership_pin_display.setVisibility(View.VISIBLE);
+                    viewHolder.leadership_pin_display.setText(conferencecallmodel.getLeadershipnumber());
+                }
+
+            }
+
+        }catch (NullPointerException e){
+
+        }
+
+        viewHolder.title_display.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Log.d(TAG+"uuuuuuu",conferencecallmodel.getDetails());
+                showInfoDialog(conferencecallmodel.getDetails());
+            }
+        });
+
+        if (!conferencecallmodel.getConference().isEmpty()){
+
+            viewHolder.list_layout_hide.setVisibility(View.VISIBLE);
+
+        }
+        if (conferencecallmodel.getConference().isEmpty()){
+            viewHolder.list_layout_hide.setVisibility(View.GONE);
+        }
+
+        final ViewHolder finalViewHolder = viewHolder;
+        viewHolder.hide_show_other.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b){
+                    finalViewHolder.liner_layout.setVisibility(View.VISIBLE);
+                    finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.subtractionsymbolbutton);
+                }else {
+                    finalViewHolder.liner_layout.setVisibility(View.GONE);
+
+                    finalViewHolder.hide_show_other.setBackgroundResource(R.drawable.add);
+                }
+            }
+        });
+
+        setItems(conferencecallmodel,position,viewHolder);
 
          notifyDataSetChanged();
 
@@ -339,7 +339,6 @@ public class InnerCallAdapter extends BaseAdapter {
                 holder.liner_layout.addView(s_view_us_east);
 
             }
-
 
             if ((size==1)&&(!eventlist.getConference().isEmpty())&&(!number.equalsIgnoreCase("+14089369000"))){
 
