@@ -98,7 +98,10 @@
             </intent-filter>
         </receiver>
         -->
-
+        <receiver
+            android:name=".receiver.RepeatAlarmReceiverMeetingLoad"
+            android:enabled="true"
+            android:exported="true" />
         <activity android:name=".DynamicListAddActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
         <activity android:name=".CheckFirstLaunchActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
         <activity android:name=".SplashScreenActivity"   android:screenOrientation="portrait" android:launchMode="singleTask"></activity>

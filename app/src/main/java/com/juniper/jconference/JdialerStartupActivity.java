@@ -3,10 +3,14 @@ package com.juniper.jconference;
 import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -61,6 +65,7 @@ import com.juniper.jconference.db.EventsDBHelper;
 import com.juniper.jconference.model.CallModel;
 import com.juniper.jconference.model.ItemData;
 import com.juniper.jconference.provider.Provider;
+import com.juniper.jconference.receiver.RepeatAlarmReceiverMeetingLoad;
 import com.juniper.jconference.util.NoDefaultSpinner;
 
 import java.text.DateFormat;
@@ -123,7 +128,7 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
         spinner=(NoDefaultSpinner)findViewById(R.id.spinner);
 
-
+        scheduleAlarm();
        /* SpinnerAdapter adapter=new SpinnerAdapter(this, R.layout.spinner_row,R.id.txt,list);
         spinner.setAdapter(adapter);*/
 
@@ -300,7 +305,33 @@ public class JdialerStartupActivity extends AppCompatActivity implements View.On
 
     }
 
+    public void scheduleAlarm() {
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 06);
+        calendar.set(Calendar.MINUTE, 01);
+        calendar.set(Calendar.SECOND, 00);
+
+        if (calendar.before(Calendar.getInstance())) {
+
+            System.out.println("CALENDER 1");
+            calendar.add(Calendar.DATE, 1);
+        } else {
+            System.out.println("CALENDER 2");
+        }
+
+        Intent intent = new Intent(getApplicationContext(), RepeatAlarmReceiverMeetingLoad.class);
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, RepeatAlarmReceiverMeetingLoad.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+        alarm.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
+      //  alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+
+        System.out.println("scheduleAlarm " + calendar.getTimeInMillis());
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 

@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.PowerManager;
 
 public class RepeatingAlarmReceiver extends BroadcastReceiver {
-
+    public static final int REQUEST_CODE = 12345;
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
